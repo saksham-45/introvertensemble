@@ -1,0 +1,1718 @@
+# Library Seat Selection with Multi-Agent Reinforcement Learning
+
+This document is a high-level but detailed research and implementation plan for a multi-agent AI system that models how people choose seats in a library and how one agent can learn to find the best available seat in a changing social environment.
+
+The goal is not only to build the system, but also to explain the concepts behind it in plain language so that the project is understandable before it is implemented.
+
+---
+
+## 1. Plain-English Summary
+
+We want to simulate a library where many people enter, walk around, and choose seats.
+
+Each person has preferences. Some may want:
+
+- quiet areas
+- strong Wi-Fi
+- outlets
+- corner seats
+- low foot traffic
+- stable surroundings
+- familiar areas they have used before
+
+We especially care about introverted behavior. Introverted agents may prefer:
+
+- fewer nearby people
+- predictable surroundings
+- lower risk of interruption
+- more visual privacy
+- staying in similar areas over time
+- not moving too often unless it is really worth it
+
+This creates a decision problem because every person affects everyone else. If one student sits in a quiet corner, that corner becomes less private for others. If several students move toward a good area, it may stop being a good area.
+
+That is why this is not just a normal machine learning problem. It is a multi-agent decision problem.
+
+In this project, we will model the library as a world with rules, agents, rewards, and dynamics. Then we will use game theory and reinforcement learning to study how seat choices emerge and how a learning agent can act well inside that world.
+
+---
+
+## 2. What This Project Really Is
+
+At a research level, this project is:
+
+- a simulation system
+- a behavioral model
+- a game-theoretic environment
+- a multi-agent reinforcement learning problem
+- a sequential decision-making problem under uncertainty
+
+In simpler terms:
+
+- many agents make choices
+- those choices affect the environment
+- the environment changes over time
+- agents may react to each other
+- agents may build habits or preferences from repeated experience
+
+This means the project is not just about choosing the best seat once.
+
+It is about repeated seat choice over time in a world where:
+
+- new people arrive
+- people leave
+- good zones fill up
+- noisy areas shift
+- familiar areas may become crowded
+- people may move if conditions worsen
+
+---
+
+## 3. Core Question
+
+The main research question is:
+
+How can an intelligent agent learn to choose and possibly re-choose seats in a shared library environment when many other agents are also choosing seats based on their own preferences?
+
+Important sub-questions:
+
+1. How should we model seat quality?
+2. How should we model introverted behavior?
+3. How should we model habit formation and consistency?
+4. How should we model crowding and social discomfort?
+5. How should we handle new arrivals and reseating?
+6. What learning method is best when many agents affect one another?
+7. How do we know whether the learned behavior is actually good?
+
+---
+
+## 4. The Main Concepts and Terms
+
+This section defines the main terms in simple language.
+
+### 4.1 Agent
+
+An **agent** is an entity that can observe the world, make decisions, and take actions.
+
+In this project, an agent is a library user.
+
+Examples:
+
+- a quiet student looking for isolation
+- a student who needs an outlet
+- a student who does not mind sitting near others
+- our main learning agent
+
+### 4.2 Environment
+
+The **environment** is the world the agents live in.
+
+In this project, the environment is the library:
+
+- seats
+- tables
+- entrances
+- quiet zones
+- noisy zones
+- Wi-Fi quality
+- moving people
+
+### 4.3 State
+
+The **state** is the full description of the environment at a particular moment.
+
+A state may include:
+
+- which seats are occupied
+- where each person is
+- which seats have outlets
+- local crowd density
+- Wi-Fi strength at different locations
+- time of day
+- who just arrived
+
+If you know the state, you know everything important about the current world.
+
+### 4.4 Observation
+
+An **observation** is what one agent can actually see or know.
+
+This is different from the full state.
+
+For example:
+
+- the full state may include every seat in the building
+- an agent may only observe nearby seats or local crowding
+
+This matters because real agents often do not know everything.
+
+### 4.5 Action
+
+An **action** is a choice an agent can make.
+
+Examples:
+
+- move north
+- move south
+- move toward a seat
+- sit down
+- stay seated
+- stand up and leave
+- switch to a new seat
+
+### 4.6 Reward
+
+A **reward** is a number that tells an agent how good or bad an outcome was.
+
+Examples:
+
+- positive reward for strong Wi-Fi
+- negative reward for crowding
+- positive reward for privacy
+- negative reward for moving too much
+- positive reward for sitting in a familiar comfortable area
+
+Reinforcement learning uses reward to teach agents what kinds of behavior are beneficial over time.
+
+### 4.7 Policy
+
+A **policy** is the decision rule an agent follows.
+
+In simple words:
+
+- a policy tells the agent what action to choose in each situation
+
+Examples:
+
+- a simple rule-based policy: choose the nearest quiet empty seat
+- a learned policy: choose actions based on past training
+
+### 4.8 Episode
+
+An **episode** is one full run of the environment.
+
+For this project, an episode could be:
+
+- one student entering and finding a seat
+- one hour of library activity
+- one simulated study session
+
+### 4.9 Trajectory
+
+A **trajectory** is the sequence of events over time.
+
+It includes:
+
+- states or observations
+- actions
+- rewards
+
+This is the data reinforcement learning uses for training.
+
+### 4.10 Utility
+
+**Utility** is a general game theory term for how valuable an outcome is to an agent.
+
+Reward and utility are closely related, but utility is often the broader modeling idea.
+
+For this project:
+
+- a seat with low noise, good Wi-Fi, and personal space has high utility for an introverted agent
+
+### 4.11 Game Theory
+
+**Game theory** is the study of strategic decision-making when multiple decision-makers affect one another.
+
+This project is a game theory problem because:
+
+- one person taking a seat changes the options for others
+- one person moving nearby changes another person’s comfort
+- agents may adapt based on what others do
+
+### 4.12 Reinforcement Learning
+
+**Reinforcement learning**, often shortened to **RL**, is a way of training an agent through trial and error.
+
+The agent:
+
+- acts
+- receives reward
+- learns which actions lead to better long-term outcomes
+
+### 4.13 Multi-Agent Reinforcement Learning
+
+**Multi-agent reinforcement learning**, often shortened to **MARL**, is reinforcement learning with more than one agent.
+
+This is harder than normal RL because:
+
+- the world changes because of the environment
+- the world also changes because other agents are learning and acting
+
+### 4.14 Q-Learning
+
+**Q-learning** is a reinforcement learning method that learns how good an action is in a given situation.
+
+The learned quantity is called a **Q-value**.
+
+A Q-value means:
+
+- if I take action `a` in state `s`, how good is that choice in terms of long-term reward?
+
+Q-learning is useful when actions are discrete and the problem is not too large.
+
+### 4.15 Nash Equilibrium
+
+A **Nash equilibrium** is a situation where no agent wants to change its choice if the other agents keep their choices the same.
+
+In this project:
+
+- if everyone is seated and nobody wants to move because their alternatives are worse, that is close to a Nash equilibrium
+
+### 4.16 Congestion
+
+**Congestion** means that a resource becomes less valuable when too many agents use it.
+
+In this project:
+
+- a quiet corner becomes less quiet if many students choose it
+
+### 4.17 Habit Formation
+
+**Habit formation** means an agent becomes more likely to repeat choices that worked well before.
+
+This matters a lot for introverted behavior.
+
+An agent may not start with a favorite seat, but may gradually form one because:
+
+- it repeatedly had good experiences in that area
+- that area felt safe, quiet, and predictable
+
+### 4.18 Switching Cost
+
+A **switching cost** is the penalty for changing from one seat or area to another.
+
+In real life, moving has costs:
+
+- walking effort
+- carrying items
+- discomfort
+- social exposure
+- disruption of concentration
+
+If switching cost is too low in the model, agents will move unrealistically often.
+
+### 4.19 Partial Observability
+
+**Partial observability** means the agent cannot see the full world.
+
+For example:
+
+- an agent may only know nearby seat occupancy, not the full building layout at that moment
+
+This makes the problem more realistic and more difficult.
+
+### 4.20 Non-Stationarity
+
+**Non-stationarity** means the world’s behavior changes over time in a way that breaks normal learning assumptions.
+
+In MARL, this happens because:
+
+- other agents are also changing their behavior
+
+So one agent may feel like the environment keeps changing while it is trying to learn.
+
+---
+
+## 5. Why This Problem Is Hard
+
+This project is hard because it combines several difficult things at once.
+
+### 5.1 Dynamic decision-making
+
+The best seat depends on what is happening now, not just on fixed seat quality.
+
+### 5.2 Social interaction
+
+One person’s decision changes another person’s experience.
+
+### 5.3 Habit and memory
+
+Agents do not only optimize the present moment. They may prefer consistency and familiarity.
+
+### 5.4 Multiple timescales
+
+Some changes happen quickly:
+
+- a person sits down next to you
+
+Some changes happen slowly:
+
+- your favorite area becomes your favorite because it worked well across several visits
+
+### 5.5 Many correct modeling choices
+
+This is not a simple textbook problem. There are many possible assumptions:
+
+- full observability or local observations
+- exact seats or seat zones
+- static seating or reseating
+- selfish reward or social welfare reward
+
+The challenge is choosing assumptions that are both realistic and learnable.
+
+---
+
+## 6. The Best Formal Framing for This Project
+
+The project should be framed as a **dynamic multi-agent stochastic game with congestion effects and adaptive preferences**.
+
+This long phrase is worth unpacking.
+
+### 6.1 Dynamic
+
+The world changes over time.
+
+### 6.2 Multi-agent
+
+More than one decision-maker exists.
+
+### 6.3 Stochastic
+
+Some parts of the environment are random.
+
+Examples:
+
+- who arrives next
+- when someone leaves
+- random noise in behavior
+
+### 6.4 Game
+
+Each agent’s decision affects the others.
+
+### 6.5 Congestion effects
+
+Popular seats or zones get worse when they fill up.
+
+### 6.6 Adaptive preferences
+
+Agents do not only have fixed likes and dislikes.
+
+They may develop preferences over time based on repeated positive experiences.
+
+---
+
+## 7. The “Laws” of the Library World
+
+To build a realistic simulation, we should define explicit rules.
+
+### 7.1 Seat exclusivity law
+
+One seat can only be occupied by one person at a time.
+
+### 7.2 Spatial influence law
+
+Nearby people matter more than distant people.
+
+A person sitting one seat away is more important than someone across the room.
+
+### 7.3 Congestion law
+
+As a zone fills up, privacy and comfort decrease.
+
+### 7.4 Disturbance law
+
+Entrances, printers, help desks, and walkways increase interruption risk and social exposure.
+
+### 7.5 Movement law
+
+Agents cannot instantly teleport without cost.
+
+### 7.6 Consistency law
+
+Agents may prefer familiar areas, even if those areas are not globally optimal every time.
+
+### 7.7 Habit decay law
+
+A previously liked seat or area should not remain preferred forever if the quality declines or enough time passes.
+
+### 7.8 Hysteresis law
+
+Small utility differences should not cause frequent switching.
+
+This means an agent should only move when the improvement is large enough.
+
+### 7.9 Visibility law
+
+Agents should not know what they cannot reasonably observe unless full information is intentionally used during training.
+
+### 7.10 Population heterogeneity law
+
+Different people value different things. The world should include a range of personalities and needs.
+
+---
+
+## 8. What Introverted Agents Likely Prefer
+
+These are modeling assumptions, not universal truths. They should be adjustable.
+
+### 8.1 Likely preferences
+
+- low nearby density
+- larger personal space buffer
+- lower interruption risk
+- lower foot traffic
+- lower visibility exposure
+- corner or wall-protected seats
+- quiet zones
+- stable local surroundings
+- good Wi-Fi
+- access to power outlets
+- lower neighbor turnover
+- predictable seat availability
+- consistency across visits
+
+### 8.2 Less obvious but important factors
+
+- noise variance: some people dislike unpredictable noise more than steady low noise
+- approach path exposure: walking through crowded areas may itself feel undesirable
+- social pressure risk: sitting at a large shared table may feel worse than a single desk
+- back protection: sitting with a wall behind can feel more private
+- escape visibility: some people want privacy but still like clear exit awareness
+- seat stickiness: after several good sessions, a zone may feel more desirable
+
+### 8.3 Not all introverts are identical
+
+Two introverted agents may differ:
+
+- one may prefer a window
+- another may prefer a bookshelf corner
+- one may value outlets strongly
+- another may prioritize distance from others above everything
+
+So it is better to model introversion as a weighted preference profile, not as one hardcoded rule.
+
+---
+
+## 9. Habit Formation and Consistency
+
+This is one of the most important parts of the project.
+
+The agent should not start with a built-in favorite seat.
+
+Instead:
+
+- it experiences different seats
+- some work out well
+- some do not
+- over time, it becomes biased toward the areas that repeatedly produced good outcomes
+
+This is called **emergent preference**.
+
+### 9.1 Exact-seat preference versus zone preference
+
+We should model both:
+
+- exact-seat memory
+- zone-level memory
+
+This is important because people often think:
+
+- “I like that corner”
+
+rather than:
+
+- “I only accept seat 42 and nothing else”
+
+### 9.2 What should increase habit strength
+
+- repeated successful visits
+- high realized comfort
+- low interruption
+- good Wi-Fi
+- a stable local social environment
+- recency of successful visits
+
+### 9.3 What should weaken habit strength
+
+- crowding
+- repeated disturbances
+- long time since last use
+- deterioration in the zone
+- negative surprise, such as someone sitting too close
+
+### 9.4 Why habit matters for modeling
+
+Without habit:
+
+- agents may chase slight short-term gains
+
+With habit:
+
+- agents may accept a good familiar option over an uncertain slightly better option
+
+That is more realistic for many human seating patterns.
+
+---
+
+## 10. How to Represent the Library
+
+There are several choices.
+
+### 10.1 Grid
+
+A **grid** is a map made of squares.
+
+Advantages:
+
+- easy to implement
+- easy to visualize
+- good for movement and occupancy
+
+Disadvantages:
+
+- can feel artificial if the library layout is irregular
+
+### 10.2 Graph
+
+A **graph** is a set of nodes connected by edges.
+
+In this project:
+
+- nodes can represent seats, tables, hallways, zones, or intersections
+- edges represent legal movement paths
+
+Advantages:
+
+- more flexible than a grid
+- better for real building layouts
+
+Disadvantages:
+
+- more complex to implement well
+
+### 10.3 Hybrid design
+
+Best practice for this project:
+
+- use a graph for movement and seat relationships
+- attach continuous or zone-based features to nodes and areas
+
+This gives realism without the full complexity of physical simulation.
+
+---
+
+## 11. State Design
+
+The state should be rich enough to support realistic seat choice.
+
+### 11.1 Global environment features
+
+- seat positions
+- zone positions
+- seat occupancy
+- walkway map
+- Wi-Fi field
+- noise field
+- foot traffic field
+- outlet availability
+- lighting score
+- window proximity
+- wall protection score
+- interruption risk field
+
+### 11.2 Agent features
+
+For each agent:
+
+- current position
+- whether the agent is seated
+- current seat
+- personality weights
+- introversion level
+- tolerance thresholds
+- movement aversion
+- study duration
+- seat memory
+- zone memory
+- current satisfaction level
+
+### 11.3 Time features
+
+- current time step
+- elapsed session time
+- arrival intensity
+- departure intensity
+
+---
+
+## 12. Observation Design
+
+An observation is what a single agent receives as input.
+
+There are two main designs.
+
+### 12.1 Full observation
+
+The agent sees:
+
+- the whole library
+- all occupied seats
+- all seat features
+
+Benefits:
+
+- easier to train
+- easier to debug
+
+Downside:
+
+- less realistic
+
+### 12.2 Local observation
+
+The agent sees:
+
+- nearby seats
+- nearby people
+- local density
+- remembered history
+
+Benefits:
+
+- more realistic
+- better fit for decentralized agents
+
+Downside:
+
+- harder learning problem
+
+### 12.3 Best-practice recommendation
+
+Use this progression:
+
+1. full observation for early baselines
+2. partial observation for serious research experiments
+
+---
+
+## 13. Action Space
+
+The action space is the set of actions an agent is allowed to take.
+
+### 13.1 Discrete action space
+
+A **discrete** action space means the agent chooses from a fixed list.
+
+Examples:
+
+- move to neighboring node
+- sit
+- stay
+- stand
+- relocate
+
+This is the best starting point and works well with Q-learning.
+
+### 13.2 Continuous action space
+
+A **continuous** action space means actions are numeric values from a range.
+
+Examples:
+
+- exact movement direction
+- speed
+
+This is usually unnecessary for this project at first.
+
+### 13.3 Recommended choice
+
+Use a discrete graph-based action space first.
+
+---
+
+## 14. Reward Design
+
+Reward design is one of the most important parts of the project.
+
+The reward must represent what the agent actually wants over time.
+
+### 14.1 Immediate seat quality
+
+This includes:
+
+- Wi-Fi strength
+- outlet access
+- comfort
+- lighting
+- quietness
+- wall protection
+- corner score
+
+### 14.2 Social comfort
+
+This includes:
+
+- nearby density penalty
+- nearest-neighbor penalty
+- foot traffic penalty
+- interruption risk penalty
+- exposure penalty
+
+### 14.3 Stability and consistency
+
+This includes:
+
+- habit bonus
+- familiar zone bonus
+- switching penalty
+- movement penalty
+
+### 14.4 Example reward structure
+
+```text
+reward =
+  + seat_quality
+  + familiarity_bonus
+  + zone_consistency_bonus
+  + stability_bonus
+  - local_density_penalty
+  - interruption_penalty
+  - exposure_penalty
+  - movement_cost
+  - switching_cost
+```
+
+### 14.5 Important warning
+
+If movement cost and switching cost are too small:
+
+- agents will constantly move
+
+If they are too large:
+
+- agents will refuse to leave bad seats
+
+This balance must be tuned carefully.
+
+---
+
+## 15. Mathematical Modeling at a High Level
+
+We do not need full notation before implementation, but the structure should be clear.
+
+### 15.1 State
+
+At time `t`, the state `s_t` contains:
+
+- current library occupancy
+- seat features
+- agent locations
+- agent memories
+- current environmental fields
+
+### 15.2 Action
+
+Agent `i` chooses action `a_i(t)`.
+
+### 15.3 Transition
+
+The environment uses the current state and all agent actions to produce the next state.
+
+This is written conceptually as:
+
+```text
+s_(t+1) = T(s_t, a_1(t), a_2(t), ..., a_n(t), randomness)
+```
+
+Where:
+
+- `T` is the transition function
+- randomness captures arrivals, departures, and stochastic behavior
+
+### 15.4 Reward
+
+Each agent gets a reward:
+
+```text
+r_i(t) = R_i(s_t, a_1(t), ..., a_n(t), s_(t+1))
+```
+
+This means reward depends on:
+
+- the current world
+- all actions
+- the outcome after those actions
+
+### 15.5 Habit update
+
+We also maintain a memory score for seats or zones.
+
+Conceptually:
+
+```text
+habit_(t+1) = decay * habit_t + learning_rate * realized_quality
+```
+
+This means:
+
+- old preference fades slowly
+- new positive experience strengthens preference
+
+---
+
+## 16. Why Game Theory Matters Here
+
+Game theory matters because seat choice is strategic.
+
+### 16.1 Strategic interaction
+
+If one quiet corner is good for everyone, several people may want it.
+
+The moment one person takes it:
+
+- the outcome changes for everyone else
+
+### 16.2 Nash equilibrium in this context
+
+A seating arrangement is approximately stable if:
+
+- no one can improve much by switching alone
+
+### 16.3 Congestion games
+
+This project behaves a lot like a **congestion game**.
+
+That means:
+
+- resources get worse when more agents use them
+
+Here, seats and zones are the resources.
+
+### 16.4 Best-response dynamics
+
+A **best response** is the best action given what everyone else is currently doing.
+
+If agents repeatedly update to their best response, the system may approach a stable seating arrangement.
+
+This is a strong non-learning baseline.
+
+---
+
+## 17. Why Reinforcement Learning Matters Here
+
+Game theory alone is not enough because the problem is dynamic and repeated.
+
+Reinforcement learning matters because:
+
+- agents may need to balance immediate seat quality against long-term stability
+- they may need to learn from experience
+- they may need to react to uncertain future arrivals
+- they may need to discover useful habits and thresholds
+
+In short:
+
+- game theory helps describe the strategic structure
+- reinforcement learning helps learn behavior over time
+
+---
+
+## 18. Why Multi-Agent Reinforcement Learning Is Hard
+
+### 18.1 Non-stationarity
+
+If every agent is learning at once:
+
+- the environment keeps changing
+
+### 18.2 Joint action space explosion
+
+If each of 20 agents has 10 actions, the total number of combined action choices becomes huge.
+
+### 18.3 Credit assignment
+
+If global comfort improves, it can be hard to tell which agent’s behavior caused it.
+
+### 18.4 Equilibrium instability
+
+Training may produce seat-switching loops rather than stable patterns.
+
+### 18.5 Partial observability
+
+Agents often cannot see the full building, which makes decision-making harder.
+
+---
+
+## 19. Algorithms You Should Know
+
+This section explains the most important methods and where they fit.
+
+### 19.1 Rule-based baselines
+
+These are hand-designed decision rules.
+
+Examples:
+
+- choose the highest-scoring empty seat
+- move only if improvement exceeds threshold
+- prefer previous zone if still acceptable
+
+Why they matter:
+
+- easy to debug
+- provide comparison points
+- help verify whether RL is truly useful
+
+### 19.2 Q-learning
+
+Q-learning learns the long-term value of actions.
+
+Best when:
+
+- actions are discrete
+- environment is relatively small
+
+Weakness:
+
+- scales poorly when state and agent count become large
+
+### 19.3 Deep Q-Networks
+
+A **Deep Q-Network**, usually called **DQN**, uses a neural network to estimate Q-values.
+
+Why use it:
+
+- can handle larger state spaces than tabular Q-learning
+
+Why be careful:
+
+- multi-agent settings make DQN unstable if used naively
+
+### 19.4 PPO
+
+**Proximal Policy Optimization**, usually called **PPO**, is a policy-gradient RL method.
+
+What that means:
+
+- instead of learning only action values, it directly learns a policy
+
+Why it is popular:
+
+- relatively stable
+- strong default choice in many RL projects
+
+### 19.5 Independent learning
+
+In **independent learning**, each agent learns as if the others are just part of the environment.
+
+Examples:
+
+- independent Q-learning
+- independent PPO
+
+Benefit:
+
+- easy to implement
+
+Problem:
+
+- ignores the fact that the environment is being changed by other learners
+
+### 19.6 CTDE
+
+**Centralized Training, Decentralized Execution**, shortened to **CTDE**, is a major MARL design pattern.
+
+It means:
+
+- during training, the algorithm can use more global information
+- during execution, each agent acts only from its own observation
+
+This is one of the best-practice approaches for realistic MARL systems.
+
+### 19.7 MAPPO
+
+**Multi-Agent PPO**, usually called **MAPPO**, is a multi-agent version of PPO using CTDE ideas.
+
+This is one of the strongest practical choices for your project.
+
+Why:
+
+- strong empirical performance
+- suitable for many-agent partially cooperative environments
+
+### 19.8 MADDPG
+
+**Multi-Agent Deep Deterministic Policy Gradient**, usually called **MADDPG**, is better suited when actions are continuous.
+
+This project does not need it at first.
+
+### 19.9 QMIX
+
+**QMIX** is a value-decomposition MARL method designed mainly for cooperative settings.
+
+It is less natural if agents are mostly self-interested, though it may be useful if you also care about total system welfare.
+
+### 19.10 Mean-field methods
+
+**Mean-field** methods approximate the effect of many nearby agents by a summary such as local crowd density instead of tracking each interaction separately.
+
+This is useful when the population is large.
+
+### 19.11 Opponent modeling
+
+**Opponent modeling** means learning or estimating how other agents behave.
+
+This matters if:
+
+- nearby agents are strategic
+- relocation behavior strongly affects outcomes
+
+---
+
+## 20. Recommended Research Strategy
+
+Do not begin with full symmetric MARL immediately.
+
+That is a common way to create a system that is complicated but impossible to debug.
+
+Instead, follow this sequence.
+
+### 20.1 Stage 1: Build the simulator
+
+First make a high-quality environment with:
+
+- valid movement
+- seat occupancy
+- realistic seat features
+- crowding effects
+- habit memory
+- switching costs
+
+### 20.2 Stage 2: Add non-learning agents
+
+Use:
+
+- greedy agents
+- threshold-based agents
+- noisy best-response agents
+
+These give you realistic dynamics without early training instability.
+
+### 20.3 Stage 3: Train one focal RL agent
+
+Train your main agent against scripted populations.
+
+This helps validate:
+
+- reward design
+- state representation
+- habit logic
+- seat-switching dynamics
+
+### 20.4 Stage 4: Move to multi-agent learning
+
+Only after the simulator and baselines are stable should you train many adaptive agents.
+
+### 20.5 Stage 5: Scale and analyze
+
+At that stage:
+
+- compare algorithms
+- analyze stability
+- measure equilibrium-like behavior
+- test generalization to new layouts
+
+---
+
+## 21. System Architecture
+
+```mermaid
+flowchart TD
+    A["Library Simulator"] --> B["State / Observation Builder"]
+    B --> C["Rule-Based Agents"]
+    B --> D["RL Agents"]
+    C --> E["Action Set"]
+    D --> E
+    E --> F["Environment Transition"]
+    F --> G["Rewards and Habit Updates"]
+    G --> A
+```
+
+### 21.1 Main system modules
+
+- environment engine
+- seat and zone feature engine
+- agent behavior engine
+- habit and memory engine
+- reward engine
+- training engine
+- evaluation engine
+- experiment tracking and replay system
+
+---
+
+## 22. Suggested Environment Feature Set
+
+### 22.1 Seat-level features
+
+- position
+- occupied or empty
+- outlet access
+- comfort score
+- desk size
+- wall adjacency
+- corner score
+- window score
+- lighting score
+
+### 22.2 Zone-level features
+
+- quietness
+- foot traffic
+- Wi-Fi quality
+- interruption risk
+- crowd density
+- historical turnover
+
+### 22.3 Dynamic features
+
+- current nearby people count
+- nearest-neighbor distance
+- local social churn
+- recent arrivals nearby
+- expected likelihood of someone sitting close
+
+---
+
+## 23. Suggested Agent Feature Set
+
+Each agent should have:
+
+- privacy preference
+- Wi-Fi preference
+- outlet preference
+- comfort preference
+- movement aversion
+- switching aversion
+- introversion level
+- familiarity preference
+- uncertainty aversion
+- study duration
+- observation range
+- reseating threshold
+
+### 23.1 Personality profile idea
+
+Instead of one label, define a weight vector.
+
+Example:
+
+```text
+agent_profile =
+{
+  privacy_weight,
+  wifi_weight,
+  comfort_weight,
+  outlet_weight,
+  movement_aversion,
+  switching_aversion,
+  familiarity_weight,
+  uncertainty_aversion
+}
+```
+
+This is more flexible and more realistic than classifying everyone as simply introverted or extroverted.
+
+---
+
+## 24. Habit and Memory Module
+
+This is a core research module.
+
+### 24.1 What it stores
+
+- visit count per seat
+- visit count per zone
+- recent average utility per seat
+- recent average utility per zone
+- recency score
+- disappointment count
+
+### 24.2 What it does
+
+It estimates:
+
+- “this area tends to work for me”
+- “this exact seat has been good recently”
+- “this area used to be good but has become unreliable”
+
+### 24.3 Design recommendation
+
+Use both:
+
+- exact seat memory
+- zone memory
+
+Zone memory should usually be stronger than exact-seat memory in the beginning.
+
+---
+
+## 25. Proposed Learning Progression
+
+```mermaid
+flowchart LR
+    A["Static Seating Baselines"] --> B["Dynamic Reseating with Rules"]
+    B --> C["Single RL Agent vs Scripted Population"]
+    C --> D["Independent Multi-Agent RL"]
+    D --> E["CTDE / MAPPO"]
+    E --> F["Large Population / Mean-Field Methods"]
+```
+
+### 25.1 Static seating baselines
+
+No movement after sitting.
+
+Purpose:
+
+- understand pure seat allocation
+
+### 25.2 Dynamic reseating
+
+Allow agents to move when utility falls.
+
+Purpose:
+
+- study stability and switching costs
+
+### 25.3 Single-agent RL
+
+One learning agent, many scripted others.
+
+Purpose:
+
+- simpler debugging
+
+### 25.4 Full MARL
+
+Many adaptive agents.
+
+Purpose:
+
+- capture strategic adaptation at scale
+
+---
+
+## 26. Best Algorithm Choices by Stage
+
+### 26.1 Early baselines
+
+- greedy selection
+- threshold-based relocation
+- best-response updates
+
+### 26.2 First RL stage
+
+- tabular Q-learning for toy environments
+- DQN for larger discrete cases
+- PPO if the observation space becomes richer
+
+### 26.3 Main research stage
+
+- MAPPO as the main serious baseline
+- independent PPO as a simpler comparison
+- mean-field Q-learning or mean-field actor-critic for many-agent scaling
+
+### 26.4 Why not start with full Q-learning for everyone
+
+Because:
+
+- the state space becomes huge
+- the joint action space becomes huge
+- learning becomes unstable
+
+Q-learning is still valuable:
+
+- as a concept
+- as a toy baseline
+- as a sanity-check implementation
+
+---
+
+## 27. Metrics and Evaluation
+
+A serious project needs more than one score.
+
+### 27.1 Individual-level metrics
+
+- average reward
+- average seat quality
+- average crowd exposure
+- average movement count
+- average switching frequency
+- average session satisfaction
+
+### 27.2 System-level metrics
+
+- total social welfare
+- average occupancy efficiency
+- average time to stable seating
+- congestion distribution
+- fairness across personality types
+
+### 27.3 Stability metrics
+
+- seat churn rate
+- probability of reseating
+- average utility drop before moving
+- equilibrium persistence after a new arrival
+
+### 27.4 Generalization metrics
+
+- performance on unseen library layouts
+- performance under different arrival rates
+- performance under different personality mixes
+
+---
+
+## 28. Risks You Must Plan For
+
+### 28.1 Oscillation
+
+Agents may keep moving back and forth.
+
+Fixes:
+
+- switching cost
+- reseating thresholds
+- cooldown periods
+
+### 28.2 Reward hacking
+
+Agents may exploit the reward in unrealistic ways.
+
+Example:
+
+- wandering in a loop to avoid local penalties without sitting
+
+Fixes:
+
+- add settling incentives
+- penalize pointless movement
+
+### 28.3 Unrealistic omniscience
+
+If agents know everything, learned behavior may be unrealistic.
+
+Fix:
+
+- eventually move to partial observability
+
+### 28.4 Overfitting to one layout
+
+If training uses one library map, behavior may not generalize.
+
+Fix:
+
+- use multiple layouts and withheld test layouts
+
+### 28.5 Unclear research conclusions
+
+If no strong baselines exist, it will be hard to tell whether MARL helped.
+
+Fix:
+
+- compare against rule-based and optimization baselines
+
+---
+
+## 29. Recommended Software Stack
+
+### 29.1 Core implementation
+
+- Python for the first version
+- `numpy` for numerical work
+- `networkx` if using graphs
+- `PyTorch` for neural networks
+- `Gymnasium` style API for single-agent interfaces
+- `PettingZoo` style API for multi-agent interfaces
+
+### 29.2 RL frameworks
+
+Possible choices:
+
+- `Ray RLlib`
+- `Tianshou`
+- `CleanRL` with custom wrappers
+
+For a research-grade but understandable first system:
+
+- custom environment
+- PyTorch models
+- start with your own baselines
+- integrate a stable MARL framework when the environment is mature
+
+### 29.3 Experiment tools
+
+- `Weights & Biases` or `MLflow`
+- config files for reproducibility
+- deterministic seeds
+- replay logging
+
+---
+
+## 30. Suggested Project Phases
+
+### Phase 1: Problem definition
+
+Outputs:
+
+- full concept brief
+- terminology glossary
+- environment assumptions
+- clear agent types
+
+### Phase 2: Simulator prototype
+
+Outputs:
+
+- seat graph or grid
+- movement rules
+- occupancy rules
+- feature maps
+- visualization
+
+### Phase 3: Baseline behavior models
+
+Outputs:
+
+- greedy agents
+- threshold relocation agents
+- noisy rational agents
+
+### Phase 4: Habit and introversion model
+
+Outputs:
+
+- memory system
+- familiarity bonuses
+- switching aversion
+- stability analysis
+
+### Phase 5: RL for one focal agent
+
+Outputs:
+
+- DQN or PPO agent
+- reward tuning
+- benchmark against scripted agents
+
+### Phase 6: Multi-agent RL
+
+Outputs:
+
+- independent MARL baseline
+- MAPPO implementation
+- evaluation under different population mixes
+
+### Phase 7: Research-quality evaluation
+
+Outputs:
+
+- ablation studies
+- metric dashboards
+- layout generalization tests
+- equilibrium and welfare analysis
+
+---
+
+## 31. Recommended Best Practices
+
+### 31.1 Build baselines before MARL
+
+If scripted agents do not behave sensibly, the simulator is not ready.
+
+### 31.2 Keep the world interpretable
+
+Every reward term and feature should have a meaning you can explain.
+
+### 31.3 Separate concerns
+
+Keep these modules independent:
+
+- environment logic
+- reward logic
+- agent policy
+- training code
+- evaluation code
+
+### 31.4 Log everything
+
+Save:
+
+- actions
+- rewards
+- seat choices
+- reseating events
+- local density
+- habit scores
+
+### 31.5 Use ablations
+
+An **ablation** is an experiment where one component is removed to test whether it matters.
+
+Examples:
+
+- remove habit bonus
+- remove switching cost
+- remove local crowd penalty
+
+This is essential for understanding what the system is learning.
+
+---
+
+## 32. A Good First Research Hypothesis
+
+One strong hypothesis for this project is:
+
+Agents with habit formation and switching costs will produce more stable and human-like seating patterns than agents optimizing only instantaneous seat quality.
+
+A second strong hypothesis:
+
+CTDE-based multi-agent learning will outperform independent Q-learning in dynamic high-density settings with repeated reseating.
+
+These are useful because they are:
+
+- testable
+- clear
+- meaningful
+
+---
+
+## 33. What “Success” Should Mean
+
+Success should not mean:
+
+- highest raw reward only
+
+Success should mean:
+
+- realistic seating behavior
+- stable seat choices
+- sensible reactions to crowding
+- measurable habit formation
+- strong generalization to new layouts
+- clear empirical improvement over baselines
+
+---
+
+## 34. What We Should Build First
+
+The best next implementation target is not full MARL.
+
+It is:
+
+1. a clean library simulator
+2. a clear reward model
+3. rule-based agents
+4. habit and consistency logic
+5. one RL agent against those agents
+
+This is the shortest path to a system that is both understandable and research-worthy.
+
+---
+
+## 35. Final Recommended Roadmap
+
+### Step 1
+
+Create the environment specification:
+
+- map format
+- seat features
+- agent features
+- rules
+
+### Step 2
+
+Implement the simulator:
+
+- graph or grid
+- occupancy and movement
+- crowd metrics
+
+### Step 3
+
+Implement seat utility and habit scoring.
+
+### Step 4
+
+Implement three rule-based baseline agents.
+
+### Step 5
+
+Run simulations and verify behavior.
+
+### Step 6
+
+Train a single DQN or PPO agent.
+
+### Step 7
+
+Move to multi-agent training with MAPPO.
+
+### Step 8
+
+Run ablations and evaluation across layouts and populations.
+
+---
+
+## 36. Glossary
+
+This is a short recap of the most important terms.
+
+- **Agent**: a decision-maker in the system
+- **Environment**: the world the agents act in
+- **State**: the full situation of the world at one time
+- **Observation**: what one agent can see
+- **Action**: a choice available to an agent
+- **Reward**: numerical feedback about outcome quality
+- **Policy**: the rule used to choose actions
+- **Episode**: one full simulation run
+- **Trajectory**: a sequence of observations, actions, and rewards
+- **Utility**: how desirable an outcome is to an agent
+- **Game theory**: study of strategic interaction
+- **RL**: learning by trial and error from reward
+- **MARL**: reinforcement learning with multiple agents
+- **Q-learning**: learning long-term action values
+- **DQN**: neural-network version of Q-learning
+- **PPO**: policy-gradient reinforcement learning method
+- **CTDE**: centralized training, decentralized execution
+- **MAPPO**: multi-agent PPO
+- **Congestion**: a resource getting worse as more agents use it
+- **Nash equilibrium**: a stable outcome where no one wants to deviate alone
+- **Habit formation**: learned tendency to repeat previously successful choices
+- **Switching cost**: penalty for changing seat or zone
+- **Partial observability**: agent cannot see the full environment
+- **Non-stationarity**: environment changes because other agents are learning or adapting
+- **Ablation**: removing one component to test its impact
+
+---
+
+## 37. Final Note
+
+The correct way to build this project is to treat it as both:
+
+- a behavioral simulation of human seat choice
+- a strategic learning problem in a shared environment
+
+If we build it carefully, this can become a serious research platform rather than just a toy RL demo.
+
+The best implementation path is disciplined:
+
+- define the world
+- define the rules
+- define the rewards
+- define the baselines
+- then train
+
+That order matters.
