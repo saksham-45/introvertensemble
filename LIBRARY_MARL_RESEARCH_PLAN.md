@@ -29,11 +29,28 @@ We especially care about introverted behavior. Introverted agents may prefer:
 - staying in similar areas over time
 - not moving too often unless it is really worth it
 
+One important modeling point is that our main agent is not trying to optimize a completely different objective from everyone else. Most library users also prefer:
+
+- decent Wi-Fi
+- less crowding
+- lower noise
+- reasonable comfort
+
+The difference is one of degree, not category. Our focal agent is more sensitive than the average agent to:
+
+- nearby crowding
+- unpredictable neighbor changes
+- interruption risk
+- social exposure
+- being forced to move
+
 This creates a decision problem because every person affects everyone else. If one student sits in a quiet corner, that corner becomes less private for others. If several students move toward a good area, it may stop being a good area.
 
 That is why this is not just a normal machine learning problem. It is a multi-agent decision problem.
 
 In this project, we will model the library as a world with rules, agents, rewards, and dynamics. Then we will use game theory and reinforcement learning to study how seat choices emerge and how a learning agent can act well inside that world.
+
+Another central point is that a library is not static. People constantly enter, look around, sit, leave, and sometimes reseat. That arrival-and-departure churn is one of the main reasons the problem is interesting. A seat that is excellent now may become bad ten minutes later because a new cluster of people arrives nearby.
 
 ---
 
@@ -66,6 +83,8 @@ It is about repeated seat choice over time in a world where:
 - familiar areas may become crowded
 - people may move if conditions worsen
 
+Because of this, the system should not be treated as a one-time optimization problem. It is a repeated adaptation problem in a changing population.
+
 ---
 
 ## 3. Core Question
@@ -80,7 +99,7 @@ Important sub-questions:
 2. How should we model introverted behavior?
 3. How should we model habit formation and consistency?
 4. How should we model crowding and social discomfort?
-5. How should we handle new arrivals and reseating?
+5. How should we handle new arrivals, departures, and reseating?
 6. What learning method is best when many agents affect one another?
 7. How do we know whether the learned behavior is actually good?
 
@@ -492,6 +511,39 @@ Two introverted agents may differ:
 
 So it is better to model introversion as a weighted preference profile, not as one hardcoded rule.
 
+### 8.4 How the focal agent differs from the rest
+
+This should be made explicit because it is central to the project.
+
+Most agents in the library should still prefer:
+
+- good Wi-Fi
+- lower noise
+- lower crowd density
+- reasonable comfort
+- decent stability
+
+The focal agent should differ mainly by stronger sensitivity.
+
+That means the focal agent has:
+
+- stronger privacy preference
+- stronger penalty for nearby crowding
+- stronger penalty for interruption risk
+- stronger dislike of neighbor turnover
+- stronger movement aversion once settled
+- stronger preference for stable and familiar zones
+
+So the difference is not:
+
+- our agent wants good seats, others want bad seats
+
+The difference is:
+
+- our agent is more intolerant of crowding and disturbance, and therefore searches harder for the most protected and rewarding available place in the full environment
+
+This is a better and more realistic framing than making the focal agent completely separate from the rest of the population.
+
 ---
 
 ## 9. Habit Formation and Consistency
@@ -644,6 +696,22 @@ For each agent:
 - arrival intensity
 - departure intensity
 
+### 11.4 Population churn features
+
+Population churn means the flow of people entering, leaving, and reseating.
+
+This is central to the library setting and should be treated as a first-class part of the state, not as a minor extra variable.
+
+Useful features include:
+
+- recent arrival count by zone
+- recent departure count by zone
+- recent reseating count by zone
+- expected near-future occupancy pressure
+- local neighbor turnover rate
+
+These features matter because many introverted agents care not only about how crowded a seat is right now, but also about whether that area is likely to stay stable.
+
 ---
 
 ## 12. Observation Design
@@ -768,6 +836,14 @@ This includes:
 - switching penalty
 - movement penalty
 
+For the focal introverted agent, these terms should usually be weighted more strongly than for the rest of the population.
+
+The same is true for:
+
+- local density penalty
+- interruption penalty
+- exposure penalty
+
 ### 14.4 Example reward structure
 
 ```text
@@ -782,6 +858,10 @@ reward =
   - movement_cost
   - switching_cost
 ```
+
+This reward structure should be shared across the population at a high level, but with different weights for different agent types.
+
+That is important. The focal agent should not live in a completely different reward universe. Instead, it should have a sharper version of common library preferences.
 
 ### 14.5 Important warning
 
@@ -828,7 +908,9 @@ s_(t+1) = T(s_t, a_1(t), a_2(t), ..., a_n(t), randomness)
 Where:
 
 - `T` is the transition function
-- randomness captures arrivals, departures, and stochastic behavior
+- randomness captures arrivals, departures, reseating pressure, and stochastic behavior
+
+In this project, arrivals and departures are not background noise. They are one of the main drivers of instability and adaptation, and they are a key reason reinforcement learning is useful here.
 
 ### 15.4 Reward
 
@@ -1180,6 +1262,9 @@ flowchart TD
 - nearest-neighbor distance
 - local social churn
 - recent arrivals nearby
+- recent departures nearby
+- recent seat-switches nearby
+- predicted short-term occupancy pressure
 - expected likelihood of someone sitting close
 
 ---
@@ -1197,6 +1282,9 @@ Each agent should have:
 - introversion level
 - familiarity preference
 - uncertainty aversion
+- crowd intolerance
+- interruption sensitivity
+- neighbor-turnover sensitivity
 - study duration
 - observation range
 - reseating threshold
@@ -1217,7 +1305,10 @@ agent_profile =
   movement_aversion,
   switching_aversion,
   familiarity_weight,
-  uncertainty_aversion
+  uncertainty_aversion,
+  crowd_intolerance,
+  interruption_sensitivity,
+  turnover_sensitivity
 }
 ```
 
