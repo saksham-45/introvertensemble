@@ -308,6 +308,7 @@ class SimAgent:
     leave_threshold: float = -0.05
     switching_improvement_threshold: float = 0.55
     cooldown_steps_remaining: int = 0
+    steps_in_current_seat: int = 0
     total_moves: int = 0
     arrivals_step: int = 0
 
@@ -317,6 +318,7 @@ class SimAgent:
         self.preferred_seat_id = self.dominant_seat_id()
         self.preferred_zone_id = self.dominant_zone_id()
         self.current_seat_id = seat_id
+        self.steps_in_current_seat = 0
 
     def dominant_seat_id(self) -> str | None:
         if not self.seat_history:

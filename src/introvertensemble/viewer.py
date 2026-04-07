@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import pygame
 from PIL import Image, ImageDraw, ImageFont
 
+from .simulation import LibrarySimulation, StepSummary
 from .world import LibraryWorld
 
 
@@ -40,6 +41,17 @@ FEATURE_GRADIENTS = {
     "interruption_risk": ((243, 239, 224), (179, 77, 56)),
 }
 
+AGENT_PROFILE_COLORS = {
+    "focal_introvert": (237, 188, 58),
+    "introvert": (91, 137, 196),
+    "quiet_seeker": (93, 145, 98),
+    "comfort_seeker": (184, 129, 78),
+    "outlet_seeker": (149, 123, 189),
+    "opportunistic_reseater": (204, 108, 96),
+    "collaborator": (72, 150, 176),
+    "standard": (148, 148, 148),
+}
+
 
 @dataclass(frozen=True)
 class Viewport:
@@ -58,14 +70,24 @@ class Viewport:
 
 
 class LibraryViewer:
-    def __init__(self, world: LibraryWorld, viewport: Viewport | None = None):
+    def __init__(
+        self,
+        world: LibraryWorld,
+        viewport: Viewport | None = None,
+        simulation: LibrarySimulation | None = None,
+    ):
         self.world = world
         self.viewport = viewport or Viewport()
         self.spec = world.spec
+        self.simulation = simulation
         self.feature_layer_name = "privacy"
         self.show_walk_graph = True
         self.show_labels = True
         self.show_seat_ids = False
+        self.running_simulation = simulation is not None
+        self.steps_per_second = 1.5
+        self._step_accumulator_ms = 0.0
+        self.last_summary: StepSummary | None = None
         self.clock = pygame.time.Clock()
         self._text_surface_cache: dict[tuple[str, int, bool, tuple[int, int, int]], pygame.Surface] = {}
 
@@ -76,15 +98,22 @@ class LibraryViewer:
 
         running = True
         while running:
+            elapsed_ms = self.clock.tick(30)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     running = self._handle_keydown(event.key, running)
 
+            if self.simulation is not None and self.running_simulation:
+                self._step_accumulator_ms += elapsed_ms
+                ms_per_step = 1000.0 / max(0.25, self.steps_per_second)
+                while self._step_accumulator_ms >= ms_per_step:
+                    self.last_summary = self.simulation.step()
+                    self._step_accumulator_ms -= ms_per_step
+
             self._draw(screen)
             pygame.display.flip()
-            self.clock.tick(30)
 
         pygame.quit()
 
@@ -104,6 +133,14 @@ class LibraryViewer:
         elif key == pygame.K_LEFT:
             index = layer_names.index(self.feature_layer_name)
             self.feature_layer_name = layer_names[(index - 1) % len(layer_names)]
+        elif key == pygame.K_SPACE and self.simulation is not None:
+            self.running_simulation = not self.running_simulation
+        elif key == pygame.K_n and self.simulation is not None:
+            self.last_summary = self.simulation.step()
+        elif key == pygame.K_UP and self.simulation is not None:
+            self.steps_per_second = min(8.0, self.steps_per_second + 0.5)
+        elif key == pygame.K_DOWN and self.simulation is not None:
+            self.steps_per_second = max(0.5, self.steps_per_second - 0.5)
         return running
 
     def _draw(self, screen: pygame.Surface) -> None:
@@ -128,6 +165,7 @@ class LibraryViewer:
         if self.show_walk_graph:
             self._draw_walk_graph(screen, world_rect)
         self._draw_entrances(screen, world_rect)
+        self._draw_event_overlays(screen, world_rect)
         self._draw_seats(screen, world_rect)
         self._draw_sidebar(screen, sidebar_rect)
 
@@ -197,12 +235,40 @@ class LibraryViewer:
             if self.show_labels:
                 self._draw_text(screen, entrance.id, px - 10, py - 24, 14, True, (25, 25, 25))
 
+    def _draw_event_overlays(self, screen: pygame.Surface, rect: pygame.Rect) -> None:
+        if self.simulation is None or self.simulation.event_engine is None:
+            return
+        for event in self.simulation.event_engine.active_events:
+            zone = self.spec.zones[event.zone_id]
+            x1, y2 = self._to_screen(zone.x1, zone.y2, rect)
+            x2, y1 = self._to_screen(zone.x2, zone.y1, rect)
+            zone_rect = pygame.Rect(x1, y2, x2 - x1, y1 - y2)
+            overlay = pygame.Surface((zone_rect.width, zone_rect.height), pygame.SRCALPHA)
+            pygame.draw.rect(overlay, (210, 76, 71, 40), overlay.get_rect(), border_radius=8)
+            screen.blit(overlay, zone_rect.topleft)
+            pygame.draw.rect(screen, (163, 52, 46), zone_rect, 3, border_radius=8)
+
     def _draw_seats(self, screen: pygame.Surface, rect: pygame.Rect) -> None:
         for seat in self.spec.seats.values():
             px, py = self._to_screen(seat.x, seat.y, rect)
-            occupied = self.world.occupancy[seat.id] is not None
-            color = (182, 58, 58) if occupied else SEAT_COLORS.get(seat.seat_type, (87, 87, 87))
+            occupant_id = self.world.occupancy[seat.id]
+            occupied = occupant_id is not None
+            color = SEAT_COLORS.get(seat.seat_type, (87, 87, 87))
+            is_focal = occupant_id == getattr(self.simulation, "focal_agent_id", None)
+            if occupied:
+                color = self._seat_occupant_color(occupant_id)
+            if is_focal:
+                halo = pygame.Surface((40, 40), pygame.SRCALPHA)
+                pygame.draw.circle(halo, (247, 212, 74, 80), (20, 20), 18)
+                screen.blit(halo, (px - 20, py - 20))
             self._draw_seat_glyph(screen, seat.seat_type, px, py, color)
+            if occupied:
+                outline_color = (248, 232, 143) if is_focal else (40, 40, 40)
+                outline_radius = 15 if is_focal else 11
+                outline_width = 3 if is_focal else 2
+                pygame.draw.circle(screen, outline_color, (px, py), outline_radius, outline_width)
+            if is_focal:
+                self._draw_text(screen, "YOU", px + 10, py - 18, 12, True, (120, 78, 8))
             if self.show_labels and not self.show_seat_ids:
                 short = seat.id.split("-")[0]
                 self._draw_text(screen, short, px + 6, py - 6, 11, False, (40, 40, 40))
@@ -223,9 +289,67 @@ class LibraryViewer:
             f"Entrances: {len(self.spec.entrances)}",
             f"Occupied: {sum(v is not None for v in self.world.occupancy.values())}",
         ]
+        if self.simulation is not None:
+            lines.extend(
+                [
+                    f"Step: {self.simulation.step_index}",
+                    f"Hour: {self.simulation.current_hour:.2f}",
+                    f"Playback: {'running' if self.running_simulation else 'paused'}",
+                    f"Speed: {self.steps_per_second:.1f} step/s",
+                ]
+            )
         for line in lines:
             self._draw_text(screen, line, rect.x + 14, y, 15, False, (40, 40, 40))
             y += 24
+
+        if self.last_summary is not None:
+            y += 8
+            self._draw_text(screen, "Latest Step", rect.x + 14, y, 15, False, (24, 24, 24))
+            y += 24
+            for line in (
+                f"Arrivals: {self.last_summary.arrivals}",
+                f"Departures: {self.last_summary.departures}",
+                f"Reseats: {self.last_summary.reseats}",
+            ):
+                self._draw_text(screen, line, rect.x + 14, y, 14, False, (48, 48, 48))
+                y += 22
+
+        if self.simulation is not None and self.simulation.event_engine is not None:
+            y += 8
+            self._draw_text(screen, "Active Events", rect.x + 14, y, 15, False, (24, 24, 24))
+            y += 24
+            active_events = self.simulation.event_engine.active_events[:5]
+            if not active_events:
+                self._draw_text(screen, "None", rect.x + 14, y, 14, False, (72, 72, 72))
+                y += 22
+            for event in active_events:
+                zone_name = self.spec.zones[event.zone_id].name
+                self._draw_text(screen, f"{event.name} @ {zone_name}", rect.x + 14, y, 13, False, (72, 48, 48))
+                y += 20
+
+        focal = None
+        if self.simulation is not None and self.simulation.focal_agent_id is not None:
+            focal = self.simulation.agents.get(self.simulation.focal_agent_id)
+        if focal is not None:
+            y += 8
+            self._draw_text(screen, "Focal Agent", rect.x + 14, y, 15, False, (24, 24, 24))
+            y += 24
+            focal_lines = [
+                f"Seat: {focal.current_seat_id or 'None'}",
+                f"Moves: {focal.total_moves}",
+                f"Cooldown: {focal.cooldown_steps_remaining}",
+                f"Preferred seat: {focal.dominant_seat_id() or 'None'}",
+                f"Preferred zone: {focal.dominant_zone_id() or 'None'}",
+            ]
+            for line in focal_lines:
+                self._draw_text(screen, line, rect.x + 14, y, 14, False, (48, 48, 48))
+                y += 20
+        elif self.simulation is not None:
+            y += 8
+            self._draw_text(screen, "Focal Agent", rect.x + 14, y, 15, False, (24, 24, 24))
+            y += 24
+            self._draw_text(screen, "Not currently in library", rect.x + 14, y, 14, False, (120, 54, 54))
+            y += 20
 
         y += 8
         self._draw_text(screen, "Controls", rect.x + 14, y, 15, False, (24, 24, 24))
@@ -235,6 +359,9 @@ class LibraryViewer:
             "G: toggle walk graph",
             "L: toggle labels",
             "I: toggle full seat ids",
+            "Space: play/pause sim",
+            "N: single simulation step",
+            "Up/Down: sim speed",
             "Esc: quit",
         ]
         for line in controls:
@@ -249,6 +376,18 @@ class LibraryViewer:
             pygame.draw.rect(screen, (31, 31, 31), pygame.Rect(rect.x + 14, y + 4, 18, 12), 1)
             self._draw_text(screen, zone_type, rect.x + 40, y, 15, False, (48, 48, 48))
             y += 22
+
+        if self.simulation is not None:
+            y += 10
+            self._draw_text(screen, "Agent Colors", rect.x + 14, y, 15, False, (24, 24, 24))
+            y += 24
+            for profile_name in ("focal_introvert", "introvert", "quiet_seeker", "comfort_seeker", "outlet_seeker", "opportunistic_reseater", "collaborator", "standard"):
+                color = AGENT_PROFILE_COLORS[profile_name]
+                pygame.draw.circle(screen, color, (rect.x + 23, y + 10), 7)
+                pygame.draw.circle(screen, (35, 35, 35), (rect.x + 23, y + 10), 7, 1)
+                label = "focal_introvert (YOU)" if profile_name == "focal_introvert" else profile_name
+                self._draw_text(screen, label, rect.x + 40, y, 14, False, (48, 48, 48))
+                y += 20
 
     def _to_screen(self, x: float, y: float, rect: pygame.Rect) -> tuple[int, int]:
         sx = rect.x + int((x / self.spec.bounds.width) * rect.width)
@@ -293,6 +432,14 @@ class LibraryViewer:
         else:
             pygame.draw.circle(screen, color, (px, py), 7)
             pygame.draw.circle(screen, outline, (px, py), 7, 1)
+
+    def _seat_occupant_color(self, occupant_id: str | None) -> tuple[int, int, int]:
+        if occupant_id is None or self.simulation is None:
+            return (182, 58, 58)
+        agent = self.simulation.agents.get(occupant_id)
+        if agent is None:
+            return (182, 58, 58)
+        return AGENT_PROFILE_COLORS.get(agent.profile.name, (182, 58, 58))
 
     def _draw_text(
         self,

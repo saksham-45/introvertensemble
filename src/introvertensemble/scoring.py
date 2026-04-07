@@ -10,6 +10,7 @@ from .world import LibraryWorld
 @dataclass(frozen=True)
 class SeatScoreBreakdown:
     total: float
+    dwell_bonus: float
     privacy: float
     wifi: float
     comfort: float
@@ -67,6 +68,10 @@ class SeatScorer:
             current_access = self.world.spec.seats[agent.current_seat_id].access_node_id
             movement_cost = self.world.shortest_path_cost(current_access, seat.access_node_id) / self._max_path_cost
 
+        dwell_bonus = 0.0
+        if agent.role == "focal" and seat_id == agent.current_seat_id:
+            dwell_bonus = min(0.18, 0.025 * agent.steps_in_current_seat)
+
         privacy = profile.privacy_weight * privacy_value
         wifi = profile.wifi_weight * wifi_value
         comfort = profile.comfort_weight * comfort_value
@@ -90,7 +95,8 @@ class SeatScorer:
         turnover_penalty = profile.turnover_sensitivity * turnover_penalty_value
 
         total = (
-            privacy
+            dwell_bonus
+            + privacy
             + wifi
             + comfort
             + outlet
@@ -110,6 +116,7 @@ class SeatScorer:
         )
         return SeatScoreBreakdown(
             total=total,
+            dwell_bonus=dwell_bonus,
             privacy=privacy,
             wifi=wifi,
             comfort=comfort,

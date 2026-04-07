@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import random
 from collections import Counter
 from dataclasses import dataclass
@@ -103,6 +104,8 @@ class LibrarySimulation:
     def _process_departures(self) -> int:
         departing_ids: list[str] = []
         for agent in self.agents.values():
+            if agent.current_seat_id is not None:
+                agent.steps_in_current_seat += 1
             agent.session_steps_remaining -= 1
             if agent.cooldown_steps_remaining > 0:
                 agent.cooldown_steps_remaining -= 1
@@ -342,14 +345,15 @@ class LibrarySimulation:
         assert current_seat_id is not None
         if agent.cooldown_steps_remaining > 0:
             return False
-        current_score = self.scorer.score_seat(agent, current_seat_id).total
-        if current_score >= agent.stay_threshold:
+        current_breakdown = self.scorer.score_seat(agent, current_seat_id)
+        current_score = current_breakdown.total
+        current_environment_score = current_score - current_breakdown.dwell_bonus
+        if current_environment_score >= agent.stay_threshold:
             return False
 
         local_candidates = self._focal_local_candidates(agent)
-        threshold = agent.switching_improvement_threshold
-        if current_score <= agent.leave_threshold:
-            fallback = self._best_focal_fallback(agent, local_candidates)
+        if current_environment_score <= agent.leave_threshold:
+            fallback = self._best_focal_fallback(agent, local_candidates, current_environment_score)
             if fallback is None:
                 return False
             self._move_agent(agent, fallback)
@@ -359,6 +363,7 @@ class LibrarySimulation:
             local_best = self._best_available_seat(agent, candidate_seat_ids=local_candidates)
             if local_best is not None:
                 local_score = self.scorer.score_seat(agent, local_best).total
+                threshold = self._focal_required_improvement(agent, local_best)
                 if local_score > current_score + threshold and local_score >= agent.arrival_acceptability_threshold:
                     self._move_agent(agent, local_best)
                     return True
@@ -367,24 +372,35 @@ class LibrarySimulation:
         if best_alt is None:
             return False
         best_score = self.scorer.score_seat(agent, best_alt).total
+        threshold = self._focal_required_improvement(agent, best_alt)
         if best_score <= current_score + threshold:
             return False
         self._move_agent(agent, best_alt)
         return True
 
-    def _best_focal_fallback(self, agent: SimAgent, local_candidates: list[str]) -> str | None:
-        if local_candidates:
-            local_best = self._best_available_seat(agent, candidate_seat_ids=local_candidates)
-            if local_best is not None:
-                if self._is_focal_fallback_acceptable(agent, local_best):
-                    return local_best
-
-        best_alt = self._best_available_seat(agent)
-        if best_alt is None:
-            return None
-        if self._is_focal_fallback_acceptable(agent, best_alt):
-            return best_alt
-        return None
+    def _best_focal_fallback(self, agent: SimAgent, local_candidates: list[str], current_score: float) -> str | None:
+        del local_candidates
+        best_id: str | None = None
+        best_acceptability = float("-inf")
+        best_score = float("-inf")
+        current_acceptability = self.scorer.fallback_acceptability_score(agent, agent.current_seat_id)
+        for seat in self.world.available_seats():
+            seat_id = seat.id
+            if not self._is_focal_fallback_acceptable(agent, seat_id):
+                continue
+            candidate_acceptability = self.scorer.fallback_acceptability_score(agent, seat_id)
+            required_acceptability_gain = self._focal_required_acceptability_gain(agent, seat_id)
+            if candidate_acceptability <= current_acceptability + required_acceptability_gain:
+                continue
+            candidate_score = self.scorer.score_seat(agent, seat_id).total
+            threshold = self._focal_required_improvement(agent, seat_id, urgent=True)
+            if candidate_score <= current_score + threshold and candidate_acceptability <= current_acceptability + required_acceptability_gain + 0.25:
+                continue
+            if (candidate_acceptability, candidate_score) > (best_acceptability, best_score):
+                best_id = seat_id
+                best_acceptability = candidate_acceptability
+                best_score = candidate_score
+        return best_id
 
     def _is_focal_fallback_acceptable(self, agent: SimAgent, seat_id: str) -> bool:
         score = self.scorer.score_seat(agent, seat_id).total
@@ -402,6 +418,34 @@ class LibrarySimulation:
             and local <= 0.95
             and zone_density <= 0.98
         )
+
+    def _focal_required_improvement(self, agent: SimAgent, candidate_seat_id: str, urgent: bool = False) -> float:
+        required = agent.switching_improvement_threshold
+        required += min(0.18, 0.02 * agent.steps_in_current_seat)
+        required += self._same_zone_micro_move_penalty(agent, candidate_seat_id)
+        if urgent:
+            return max(0.12, required * 0.40)
+        return required
+
+    def _focal_required_acceptability_gain(self, agent: SimAgent, candidate_seat_id: str) -> float:
+        required = 0.08 + min(0.10, 0.015 * agent.steps_in_current_seat)
+        required += 0.20 * self._same_zone_micro_move_penalty(agent, candidate_seat_id)
+        return required
+
+    def _same_zone_micro_move_penalty(self, agent: SimAgent, candidate_seat_id: str) -> float:
+        current_seat_id = agent.current_seat_id
+        if current_seat_id is None or current_seat_id == candidate_seat_id:
+            return 0.0
+        current_seat = self.world.spec.seats[current_seat_id]
+        candidate_seat = self.world.spec.seats[candidate_seat_id]
+        if current_seat.zone_id != candidate_seat.zone_id:
+            return 0.0
+        distance = math.dist((current_seat.x, current_seat.y), (candidate_seat.x, candidate_seat.y))
+        if distance <= 1.6:
+            return 0.65
+        if distance <= 3.0:
+            return 0.30
+        return 0.10
 
     def _move_agent(self, agent: SimAgent, new_seat_id: str) -> None:
         current_seat_id = agent.current_seat_id

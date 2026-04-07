@@ -27,6 +27,24 @@ class ScoringAndSimulationTests(unittest.TestCase):
         discussion = scorer.score_seat(intro, "DH-T1-02", origin_entrance_id="E1").total
         self.assertGreater(quiet, discussion)
 
+    def test_focal_current_seat_gets_dwell_bonus(self) -> None:
+        world = LibraryWorld(self.spec)
+        scorer = SeatScorer(world)
+        focal = SimAgent(
+            id="focal",
+            profile=AgentProfile.focal_introvert(),
+            entrance_id="E1",
+            session_steps_remaining=8,
+            role="focal",
+        )
+        world.occupy_seat("QR-SC-05", focal.id)
+        focal.record_seat("QR-SC-05", self.spec.seats["QR-SC-05"].zone_id)
+
+        early = scorer.score_seat(focal, "QR-SC-05").total
+        focal.steps_in_current_seat = 6
+        settled = scorer.score_seat(focal, "QR-SC-05").total
+        self.assertGreater(settled, early)
+
     def test_focal_agent_prefers_exact_habit_seat_on_arrival(self) -> None:
         world = LibraryWorld(self.spec)
         simulation = LibrarySimulation(world)
@@ -228,6 +246,66 @@ class ScoringAndSimulationTests(unittest.TestCase):
             world.occupy_seat(neighbor.id, f"crowd_{neighbor.id}")
 
         self.assertFalse(simulation._is_focal_fallback_acceptable(focal, crowded_fallback))
+
+    def test_focal_does_not_make_small_same_zone_micro_move(self) -> None:
+        world = LibraryWorld(self.spec)
+        simulation = LibrarySimulation(world)
+        focal = SimAgent(
+            id="focal",
+            profile=AgentProfile.focal_introvert(),
+            entrance_id="E1",
+            session_steps_remaining=10,
+            role="focal",
+            stay_threshold=10.0,
+            leave_threshold=-10.0,
+            switching_improvement_threshold=0.10,
+        )
+        current_seat = "QR-SC-05"
+        candidate_seat = "QR-SC-04"
+        world.occupy_seat(current_seat, focal.id)
+        focal.record_seat(current_seat, self.spec.seats[current_seat].zone_id)
+        focal.steps_in_current_seat = 6
+        simulation.agents[focal.id] = focal
+
+        for seat_id in ("QR-SC-06", "QR-DC-03"):
+            world.occupy_seat(seat_id, f"crowd_{seat_id}")
+
+        moved = simulation._process_focal_reseat(focal)
+        self.assertFalse(moved)
+        self.assertEqual(focal.current_seat_id, current_seat)
+
+    def test_focal_can_make_same_zone_move_when_rewarding_enough(self) -> None:
+        world = LibraryWorld(self.spec)
+        simulation = LibrarySimulation(world)
+        focal = SimAgent(
+            id="focal",
+            profile=AgentProfile.focal_introvert(),
+            entrance_id="E1",
+            session_steps_remaining=10,
+            role="focal",
+            stay_threshold=10.0,
+            leave_threshold=3.20,
+            switching_improvement_threshold=0.10,
+            arrival_acceptability_threshold=-1.0,
+        )
+        current_seat = "QR-SC-05"
+        world.occupy_seat(current_seat, focal.id)
+        focal.record_seat(current_seat, self.spec.seats[current_seat].zone_id)
+        focal.steps_in_current_seat = 6
+        simulation.agents[focal.id] = focal
+
+        for seat_id in ("QR-SC-01", "QR-SC-02", "QR-SC-03", "QR-SC-04", "QR-SC-06", "QR-DC-01", "QR-DC-02", "QR-DC-03"):
+            if world.occupancy[seat_id] is None:
+                world.occupy_seat(seat_id, f"crowd_{seat_id}")
+
+        moved = simulation._process_focal_reseat(focal)
+        self.assertTrue(moved)
+        self.assertNotEqual(focal.current_seat_id, current_seat)
+        self.assertEqual(self.spec.seats[focal.current_seat_id].zone_id, "z_quiet_room_1")
+        self.assertGreater(
+            simulation.scorer.score_seat(focal, focal.current_seat_id).total,
+            simulation.scorer.score_seat(focal, current_seat).total,
+        )
 
     def test_focal_bad_seat_does_not_force_move_into_unacceptable_fallback(self) -> None:
         world = LibraryWorld(self.spec)
