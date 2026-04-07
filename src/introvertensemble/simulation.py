@@ -5,6 +5,7 @@ from collections import Counter
 from dataclasses import dataclass
 
 from .agents import PROFILE_REGISTRY, AgentProfile, SimAgent
+from .events import EventEngine, EventStepSummary
 from .models import SpawnWindow
 from .scoring import SeatScorer
 from .world import LibraryWorld
@@ -30,6 +31,7 @@ class SimulationConfig:
     focal_agent_session_steps: int = 20
     focal_agent_initial_seat_history: tuple[str, ...] = ()
     focal_move_cooldown_steps: int = 4
+    events_enabled: bool = True
 
 
 @dataclass(frozen=True)
@@ -61,10 +63,13 @@ class LibrarySimulation:
         self._schedule_start_hour = min(window.start_hour for window in world.spec.spawn_windows)
         self._schedule_end_hour = max(window.end_hour for window in world.spec.spawn_windows)
         self.focal_agent_id: str | None = None
+        self.event_engine: EventEngine | None = EventEngine(seed=seed) if self.config.events_enabled else None
+        self.last_event_summary: EventStepSummary | None = None
         if self.config.focal_agent_enabled:
             self._create_focal_agent()
 
     def step(self) -> StepSummary:
+        self._step_events()
         window = self.world.active_spawn_window(self.current_hour)
         departures = self._process_departures()
         arrivals = self._spawn_arrivals(window)
@@ -86,6 +91,14 @@ class LibrarySimulation:
             overflow = self.current_hour - self._schedule_end_hour
             self.current_hour = self._schedule_start_hour + overflow
         return summary
+
+    def _step_events(self) -> None:
+        if self.event_engine is None:
+            self.last_event_summary = None
+            self.world.clear_dynamic_zone_layer_deltas()
+            return
+        self.last_event_summary = self.event_engine.step()
+        self.world.set_dynamic_zone_layer_deltas(self.event_engine.zone_layer_deltas())
 
     def _process_departures(self) -> int:
         departing_ids: list[str] = []
@@ -363,17 +376,32 @@ class LibrarySimulation:
         if local_candidates:
             local_best = self._best_available_seat(agent, candidate_seat_ids=local_candidates)
             if local_best is not None:
-                local_score = self.scorer.score_seat(agent, local_best).total
-                if local_score >= agent.arrival_acceptability_threshold:
+                if self._is_focal_fallback_acceptable(agent, local_best):
                     return local_best
 
         best_alt = self._best_available_seat(agent)
         if best_alt is None:
             return None
-        best_score = self.scorer.score_seat(agent, best_alt).total
-        if best_score >= agent.arrival_acceptability_threshold:
+        if self._is_focal_fallback_acceptable(agent, best_alt):
             return best_alt
         return None
+
+    def _is_focal_fallback_acceptable(self, agent: SimAgent, seat_id: str) -> bool:
+        score = self.scorer.score_seat(agent, seat_id).total
+        acceptability = self.scorer.fallback_acceptability_score(agent, seat_id)
+        seat = self.world.spec.seats[seat_id]
+        immediate = self.world.immediate_neighbor_ratio(seat_id)
+        interruption = self.world.feature_value_for_seat(seat_id, "interruption_risk")
+        local = self.world.local_crowding_ratio(seat_id)
+        zone_density = self.world.zone_density(seat.zone_id)
+        return (
+            score >= agent.arrival_acceptability_threshold
+            and acceptability >= 0.10
+            and immediate <= 0.67
+            and interruption <= 0.80
+            and local <= 0.95
+            and zone_density <= 0.98
+        )
 
     def _move_agent(self, agent: SimAgent, new_seat_id: str) -> None:
         current_seat_id = agent.current_seat_id

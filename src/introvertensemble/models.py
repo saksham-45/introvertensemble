@@ -125,3 +125,24 @@ class LayoutSpec:
     feature_layers: dict[str, FeatureLayer]
     obstacles: tuple[Obstacle, ...]
 
+
+@dataclass(frozen=True)
+class EventTemplate:
+    id: str
+    name: str
+    zone_ids: tuple[str, ...]
+    probability_per_step: float
+    min_duration_steps: int
+    max_duration_steps: int
+    layer_deltas: dict[str, float]
+    max_active_instances: int = 1
+
+
+@dataclass
+class ActiveEvent:
+    id: str
+    template_id: str
+    name: str
+    zone_id: str
+    remaining_steps: int
+    layer_deltas: dict[str, float]

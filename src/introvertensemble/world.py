@@ -12,6 +12,7 @@ class LibraryWorld:
         self.spec = spec
         self.occupancy: dict[str, str | None] = {seat_id: None for seat_id in spec.seats}
         self._adjacency = self._build_adjacency()
+        self._dynamic_zone_layer_deltas: dict[str, dict[str, float]] = {}
 
     def _build_adjacency(self) -> dict[str, list[tuple[str, float]]]:
         adjacency: dict[str, list[tuple[str, float]]] = defaultdict(list)
@@ -141,4 +142,12 @@ class LibraryWorld:
             if distance <= hotspot.radius:
                 falloff = 1.0 - (distance / hotspot.radius)
                 value += hotspot.delta * falloff
+        if seat.zone_id in self._dynamic_zone_layer_deltas:
+            value += self._dynamic_zone_layer_deltas[seat.zone_id].get(layer_name, 0.0)
         return max(0.0, min(1.0, value))
+
+    def set_dynamic_zone_layer_deltas(self, deltas: dict[str, dict[str, float]]) -> None:
+        self._dynamic_zone_layer_deltas = {zone_id: dict(layer_deltas) for zone_id, layer_deltas in deltas.items()}
+
+    def clear_dynamic_zone_layer_deltas(self) -> None:
+        self._dynamic_zone_layer_deltas = {}

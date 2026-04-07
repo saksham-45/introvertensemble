@@ -212,6 +212,55 @@ class ScoringAndSimulationTests(unittest.TestCase):
         self.assertEqual(focal.current_seat_id, moved_to)
         self.assertEqual(focal.total_moves, first_moves)
 
+    def test_focal_rejects_crowded_fallback_even_if_it_is_available(self) -> None:
+        world = LibraryWorld(self.spec)
+        simulation = LibrarySimulation(world)
+        focal = SimAgent(
+            id="focal",
+            profile=AgentProfile.focal_introvert(),
+            entrance_id="E1",
+            session_steps_remaining=10,
+            role="focal",
+            arrival_acceptability_threshold=-1.0,
+        )
+        crowded_fallback = "QR-SC-05"
+        for neighbor in world.seat_neighbors(crowded_fallback):
+            world.occupy_seat(neighbor.id, f"crowd_{neighbor.id}")
+
+        self.assertFalse(simulation._is_focal_fallback_acceptable(focal, crowded_fallback))
+
+    def test_focal_bad_seat_does_not_force_move_into_unacceptable_fallback(self) -> None:
+        world = LibraryWorld(self.spec)
+        simulation = LibrarySimulation(world)
+        focal = SimAgent(
+            id="focal",
+            profile=AgentProfile.focal_introvert(),
+            entrance_id="E4",
+            session_steps_remaining=10,
+            role="focal",
+            leave_threshold=2.5,
+            switching_improvement_threshold=0.1,
+            arrival_acceptability_threshold=-1.0,
+        )
+        world.occupy_seat("DH-T1-02", focal.id)
+        focal.record_seat("DH-T1-02", self.spec.seats["DH-T1-02"].zone_id)
+        simulation.agents[focal.id] = focal
+
+        open_fallback = "QR-SC-05"
+        for neighbor in world.seat_neighbors(open_fallback):
+            if world.occupancy[neighbor.id] is None:
+                world.occupy_seat(neighbor.id, f"crowd_{neighbor.id}")
+
+        for seat_id in self.spec.seats:
+            if seat_id in {"DH-T1-02", open_fallback}:
+                continue
+            if world.occupancy[seat_id] is None:
+                world.occupy_seat(seat_id, f"block_{seat_id}")
+
+        moved = simulation._process_focal_reseat(focal)
+        self.assertFalse(moved)
+        self.assertEqual(focal.current_seat_id, "DH-T1-02")
+
     def test_forced_reseating_can_trigger(self) -> None:
         world = LibraryWorld(self.spec)
         simulation = LibrarySimulation(

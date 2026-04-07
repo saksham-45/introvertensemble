@@ -128,3 +128,22 @@ class SeatScorer:
             movement_penalty=movement_penalty,
             turnover_penalty=turnover_penalty,
         )
+
+    def fallback_acceptability_score(self, agent: SimAgent, seat_id: str) -> float:
+        seat = self.world.spec.seats[seat_id]
+        privacy = self.world.feature_value_for_seat(seat_id, "privacy")
+        interruption = self.world.feature_value_for_seat(seat_id, "interruption_risk")
+        noise = self.world.feature_value_for_seat(seat_id, "static_noise")
+        immediate = self.world.immediate_neighbor_ratio(seat_id)
+        local = self.world.local_crowding_ratio(seat_id)
+        zone_density = self.world.zone_density(seat.zone_id)
+        comfort = float(seat.features.get("comfort", 0.5))
+        return (
+            1.35 * privacy
+            + 0.45 * comfort
+            - 0.95 * interruption
+            - 0.70 * noise
+            - 1.10 * immediate
+            - 0.55 * local
+            - 0.25 * zone_density
+        )

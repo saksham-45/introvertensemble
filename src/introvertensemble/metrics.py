@@ -12,6 +12,7 @@ class EpisodeMetrics:
     total_arrivals: int
     total_departures: int
     total_reseats: int
+    total_event_activations: int
     average_occupancy: float
     peak_occupancy: int
     average_zone_load: dict[str, float]
@@ -37,6 +38,7 @@ class MetricsTracker:
         self.occupancy_sum = 0
         self.peak_occupancy = 0
         self.zone_load_sum: dict[str, int] = defaultdict(int)
+        self.total_event_activations = 0
         self.focal_scores: list[float] = []
         self.focal_crowding: list[float] = []
         self.focal_seat_sequence: list[str] = []
@@ -49,6 +51,8 @@ class MetricsTracker:
         self.total_arrivals += summary.arrivals
         self.total_departures += summary.departures
         self.total_reseats += summary.reseats
+        if self.simulation.last_event_summary is not None:
+            self.total_event_activations += len(self.simulation.last_event_summary.activated)
         self.occupancy_sum += summary.occupancy
         self.peak_occupancy = max(self.peak_occupancy, summary.occupancy)
         for zone_id, load in summary.zone_load.items():
@@ -94,6 +98,7 @@ class MetricsTracker:
             total_arrivals=self.total_arrivals,
             total_departures=self.total_departures,
             total_reseats=self.total_reseats,
+            total_event_activations=self.total_event_activations,
             average_occupancy=(self.occupancy_sum / self.step_count) if self.step_count else 0.0,
             peak_occupancy=self.peak_occupancy,
             average_zone_load=average_zone_load,
