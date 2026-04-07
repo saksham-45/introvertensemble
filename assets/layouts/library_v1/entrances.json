@@ -1,0 +1,39 @@
+[
+  {
+    "id": "E1",
+    "label": "Main Entrance West",
+    "x": 2.8,
+    "y": 1.5,
+    "node_id": "n_e1",
+    "kind": "main",
+    "notes": "Primary entrance near the entry lounge."
+  },
+  {
+    "id": "E2",
+    "label": "Main Entrance Center",
+    "x": 10.0,
+    "y": 1.5,
+    "node_id": "n_e2",
+    "kind": "main",
+    "notes": "Central entrance connecting to circulation."
+  },
+  {
+    "id": "E4",
+    "label": "Main Entrance East",
+    "x": 16.8,
+    "y": 1.5,
+    "node_id": "n_e4",
+    "kind": "main",
+    "notes": "East-side entrance near discussion and turnover zones."
+  },
+  {
+    "id": "F1",
+    "label": "North Entry",
+    "x": 14.0,
+    "y": 15.0,
+    "node_id": "n_f1",
+    "kind": "secondary",
+    "notes": "Low-frequency north entry near cafe and reading room."
+  }
+]
+

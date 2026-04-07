@@ -1,0 +1,66 @@
+{
+  "layout_id": "library_v1",
+  "name": "Introvert Ensemble Library Prototype",
+  "version": "0.1.0",
+  "description": "First machine-readable environment spec derived from the approved top-down library layout image.",
+  "map": {
+    "width": 20.0,
+    "height": 17.0,
+    "unit": "meters",
+    "coordinate_origin": "bottom_left"
+  },
+  "files": {
+    "zones": "zones.json",
+    "seats": "seats.json",
+    "entrances": "entrances.json",
+    "walk_graph": "walk_graph.json",
+    "spawn_schedule": "spawn_schedule.json",
+    "feature_fields": "feature_fields.json"
+  },
+  "seat_type_weights": {
+    "quiet_carrel": 10,
+    "silent_carrel": 10,
+    "deep_carrel": 9,
+    "individual_desk": 6,
+    "shared_table": 4,
+    "lounge_chair": 3,
+    "high_desk": 2,
+    "booth": 5,
+    "conference_chair": 1
+  },
+  "obstacles": [
+    {
+      "id": "obs_bookshelves_west",
+      "label": "West stacks",
+      "x1": 0.8,
+      "y1": 9.2,
+      "x2": 1.6,
+      "y2": 13.9
+    },
+    {
+      "id": "obs_helpdesk_core",
+      "label": "Checkout desk block",
+      "x1": 3.8,
+      "y1": 4.1,
+      "x2": 5.4,
+      "y2": 5.9
+    },
+    {
+      "id": "obs_staff_office",
+      "label": "Staff office",
+      "x1": 10.6,
+      "y1": 3.2,
+      "x2": 13.2,
+      "y2": 6.3
+    },
+    {
+      "id": "obs_conference_table",
+      "label": "Conference table block",
+      "x1": 17.0,
+      "y1": 10.0,
+      "x2": 19.0,
+      "y2": 13.2
+    }
+  ]
+}
+

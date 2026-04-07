@@ -1,0 +1,44 @@
+{
+  "nodes": [
+    {"id": "n_e1", "x": 2.8, "y": 1.5, "tags": ["entrance"]},
+    {"id": "n_lounge_west", "x": 2.8, "y": 4.6, "tags": ["lounge"]},
+    {"id": "n_lounge_east", "x": 6.4, "y": 4.8, "tags": ["lounge"]},
+    {"id": "n_quiet_door", "x": 5.4, "y": 8.7, "tags": ["quiet_room"]},
+    {"id": "n_reading_west", "x": 7.1, "y": 10.8, "tags": ["open_reading"]},
+    {"id": "n_reading_center", "x": 10.1, "y": 10.8, "tags": ["open_reading"]},
+    {"id": "n_circulation_south", "x": 8.5, "y": 5.0, "tags": ["circulation"]},
+    {"id": "n_e2", "x": 10.0, "y": 1.5, "tags": ["entrance"]},
+    {"id": "n_info_spine", "x": 12.2, "y": 5.1, "tags": ["junction"]},
+    {"id": "n_turnover_center", "x": 15.1, "y": 5.7, "tags": ["high_turnover"]},
+    {"id": "n_reading_room", "x": 14.8, "y": 9.8, "tags": ["reading_room"]},
+    {"id": "n_cafe_junction", "x": 14.1, "y": 11.6, "tags": ["cafe"]},
+    {"id": "n_f1", "x": 14.0, "y": 15.0, "tags": ["entrance"]},
+    {"id": "n_conference_door", "x": 16.7, "y": 10.6, "tags": ["conference"]},
+    {"id": "n_discussion_west", "x": 17.6, "y": 4.8, "tags": ["discussion"]},
+    {"id": "n_discussion_east", "x": 18.6, "y": 3.4, "tags": ["discussion"]},
+    {"id": "n_e4", "x": 16.8, "y": 1.5, "tags": ["entrance"]},
+    {"id": "n_east_hall", "x": 16.9, "y": 8.7, "tags": ["junction"]}
+  ],
+  "edges": [
+    {"source": "n_e1", "target": "n_lounge_west", "cost": 3.1, "bidirectional": true},
+    {"source": "n_lounge_west", "target": "n_lounge_east", "cost": 3.6, "bidirectional": true},
+    {"source": "n_lounge_west", "target": "n_quiet_door", "cost": 4.4, "bidirectional": true},
+    {"source": "n_lounge_east", "target": "n_circulation_south", "cost": 2.2, "bidirectional": true},
+    {"source": "n_quiet_door", "target": "n_reading_west", "cost": 1.8, "bidirectional": true},
+    {"source": "n_reading_west", "target": "n_reading_center", "cost": 3.0, "bidirectional": true},
+    {"source": "n_reading_center", "target": "n_cafe_junction", "cost": 4.1, "bidirectional": true},
+    {"source": "n_cafe_junction", "target": "n_reading_room", "cost": 1.8, "bidirectional": true},
+    {"source": "n_cafe_junction", "target": "n_f1", "cost": 3.4, "bidirectional": true},
+    {"source": "n_reading_room", "target": "n_east_hall", "cost": 2.2, "bidirectional": true},
+    {"source": "n_east_hall", "target": "n_conference_door", "cost": 1.9, "bidirectional": true},
+    {"source": "n_east_hall", "target": "n_turnover_center", "cost": 3.1, "bidirectional": true},
+    {"source": "n_turnover_center", "target": "n_info_spine", "cost": 3.0, "bidirectional": true},
+    {"source": "n_info_spine", "target": "n_circulation_south", "cost": 3.7, "bidirectional": true},
+    {"source": "n_circulation_south", "target": "n_e2", "cost": 3.6, "bidirectional": true},
+    {"source": "n_turnover_center", "target": "n_discussion_west", "cost": 2.7, "bidirectional": true},
+    {"source": "n_discussion_west", "target": "n_discussion_east", "cost": 1.7, "bidirectional": true},
+    {"source": "n_discussion_west", "target": "n_e4", "cost": 3.4, "bidirectional": true},
+    {"source": "n_e4", "target": "n_discussion_east", "cost": 2.7, "bidirectional": true}
+  ]
+}
+
