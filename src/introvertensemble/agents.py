@@ -20,6 +20,8 @@ class AgentProfile:
     switching_aversion: float
     turnover_sensitivity: float
     seat_type_bias: float = 0.10
+    zone_preferences: dict[str, float] = field(default_factory=dict)
+    seat_type_preferences: dict[str, float] = field(default_factory=dict)
 
     @classmethod
     def introvert(cls) -> "AgentProfile":
@@ -34,11 +36,25 @@ class AgentProfile:
             crowd_intolerance=1.55,
             noise_sensitivity=1.25,
             interruption_sensitivity=1.45,
-            future_crowding_sensitivity=1.15,
+            future_crowding_sensitivity=0.25,
             movement_aversion=0.35,
             switching_aversion=0.85,
             turnover_sensitivity=1.10,
             seat_type_bias=0.18,
+            zone_preferences={
+                "quiet_study": 0.35,
+                "general_study": 0.10,
+                "lounge_casual": -0.10,
+                "collaboration": -0.28,
+                "high_disturbance": -0.35,
+            },
+            seat_type_preferences={
+                "quiet_carrel": 0.18,
+                "silent_carrel": 0.22,
+                "deep_carrel": 0.24,
+                "lounge_chair": -0.08,
+                "shared_table": -0.05,
+            },
         )
 
     @classmethod
@@ -54,11 +70,26 @@ class AgentProfile:
             crowd_intolerance=1.85,
             noise_sensitivity=1.35,
             interruption_sensitivity=1.65,
-            future_crowding_sensitivity=1.25,
+            future_crowding_sensitivity=0.08,
             movement_aversion=0.48,
             switching_aversion=1.15,
             turnover_sensitivity=1.25,
             seat_type_bias=0.20,
+            zone_preferences={
+                "quiet_study": 0.45,
+                "general_study": 0.08,
+                "lounge_casual": -0.14,
+                "collaboration": -0.40,
+                "high_disturbance": -0.48,
+            },
+            seat_type_preferences={
+                "quiet_carrel": 0.22,
+                "silent_carrel": 0.26,
+                "deep_carrel": 0.30,
+                "individual_desk": 0.08,
+                "shared_table": -0.10,
+                "lounge_chair": -0.12,
+            },
         )
 
     @classmethod
@@ -74,12 +105,189 @@ class AgentProfile:
             crowd_intolerance=0.80,
             noise_sensitivity=0.70,
             interruption_sensitivity=0.65,
-            future_crowding_sensitivity=0.45,
+            future_crowding_sensitivity=0.12,
             movement_aversion=0.20,
             switching_aversion=0.45,
             turnover_sensitivity=0.35,
             seat_type_bias=0.10,
+            zone_preferences={
+                "general_study": 0.10,
+                "lounge_casual": 0.02,
+                "collaboration": -0.02,
+            },
+            seat_type_preferences={
+                "individual_desk": 0.05,
+                "shared_table": 0.03,
+                "high_desk": 0.02,
+            },
         )
+
+    @classmethod
+    def quiet_seeker(cls) -> "AgentProfile":
+        return cls(
+            name="quiet_seeker",
+            privacy_weight=1.20,
+            wifi_weight=0.60,
+            comfort_weight=0.58,
+            outlet_weight=0.15,
+            familiarity_weight=0.40,
+            stability_weight=0.75,
+            crowd_intolerance=1.15,
+            noise_sensitivity=1.10,
+            interruption_sensitivity=1.05,
+            future_crowding_sensitivity=0.18,
+            movement_aversion=0.24,
+            switching_aversion=0.52,
+            turnover_sensitivity=0.72,
+            seat_type_bias=0.14,
+            zone_preferences={
+                "quiet_study": 0.28,
+                "general_study": 0.06,
+                "collaboration": -0.18,
+                "high_disturbance": -0.25,
+            },
+            seat_type_preferences={
+                "quiet_carrel": 0.16,
+                "silent_carrel": 0.18,
+                "deep_carrel": 0.20,
+                "shared_table": -0.04,
+            },
+        )
+
+    @classmethod
+    def comfort_seeker(cls) -> "AgentProfile":
+        return cls(
+            name="comfort_seeker",
+            privacy_weight=0.62,
+            wifi_weight=0.45,
+            comfort_weight=1.10,
+            outlet_weight=0.10,
+            familiarity_weight=0.25,
+            stability_weight=0.30,
+            crowd_intolerance=0.45,
+            noise_sensitivity=0.42,
+            interruption_sensitivity=0.40,
+            future_crowding_sensitivity=0.10,
+            movement_aversion=0.18,
+            switching_aversion=0.28,
+            turnover_sensitivity=0.20,
+            seat_type_bias=0.14,
+            zone_preferences={
+                "lounge_casual": 0.20,
+                "general_study": 0.08,
+                "high_disturbance": -0.08,
+            },
+            seat_type_preferences={
+                "lounge_chair": 0.22,
+                "booth": 0.16,
+                "individual_desk": 0.04,
+                "high_desk": -0.08,
+            },
+        )
+
+    @classmethod
+    def outlet_seeker(cls) -> "AgentProfile":
+        return cls(
+            name="outlet_seeker",
+            privacy_weight=0.70,
+            wifi_weight=0.82,
+            comfort_weight=0.52,
+            outlet_weight=0.85,
+            familiarity_weight=0.20,
+            stability_weight=0.28,
+            crowd_intolerance=0.55,
+            noise_sensitivity=0.46,
+            interruption_sensitivity=0.44,
+            future_crowding_sensitivity=0.10,
+            movement_aversion=0.16,
+            switching_aversion=0.26,
+            turnover_sensitivity=0.22,
+            seat_type_bias=0.12,
+            zone_preferences={
+                "general_study": 0.12,
+                "lounge_casual": 0.04,
+                "collaboration": 0.03,
+            },
+            seat_type_preferences={
+                "individual_desk": 0.12,
+                "high_desk": 0.10,
+                "shared_table": 0.03,
+            },
+        )
+
+    @classmethod
+    def opportunistic_reseater(cls) -> "AgentProfile":
+        return cls(
+            name="opportunistic_reseater",
+            privacy_weight=0.76,
+            wifi_weight=0.60,
+            comfort_weight=0.56,
+            outlet_weight=0.16,
+            familiarity_weight=0.08,
+            stability_weight=0.16,
+            crowd_intolerance=0.52,
+            noise_sensitivity=0.38,
+            interruption_sensitivity=0.34,
+            future_crowding_sensitivity=0.06,
+            movement_aversion=0.04,
+            switching_aversion=0.08,
+            turnover_sensitivity=0.12,
+            seat_type_bias=0.08,
+            zone_preferences={
+                "general_study": 0.10,
+                "lounge_casual": 0.06,
+            },
+            seat_type_preferences={
+                "individual_desk": 0.05,
+                "shared_table": 0.05,
+                "high_desk": 0.06,
+            },
+        )
+
+    @classmethod
+    def collaborator(cls) -> "AgentProfile":
+        return cls(
+            name="collaborator",
+            privacy_weight=0.25,
+            wifi_weight=0.55,
+            comfort_weight=0.60,
+            outlet_weight=0.12,
+            familiarity_weight=0.12,
+            stability_weight=0.18,
+            crowd_intolerance=0.12,
+            noise_sensitivity=0.18,
+            interruption_sensitivity=0.20,
+            future_crowding_sensitivity=0.02,
+            movement_aversion=0.10,
+            switching_aversion=0.16,
+            turnover_sensitivity=0.10,
+            seat_type_bias=0.10,
+            zone_preferences={
+                "collaboration": 0.34,
+                "general_study": 0.08,
+                "quiet_study": -0.20,
+            },
+            seat_type_preferences={
+                "shared_table": 0.16,
+                "booth": 0.14,
+                "conference_chair": 0.10,
+                "quiet_carrel": -0.14,
+                "silent_carrel": -0.18,
+                "deep_carrel": -0.20,
+            },
+        )
+
+
+PROFILE_REGISTRY = {
+    "standard": AgentProfile.standard,
+    "introvert": AgentProfile.introvert,
+    "focal_introvert": AgentProfile.focal_introvert,
+    "quiet_seeker": AgentProfile.quiet_seeker,
+    "comfort_seeker": AgentProfile.comfort_seeker,
+    "outlet_seeker": AgentProfile.outlet_seeker,
+    "opportunistic_reseater": AgentProfile.opportunistic_reseater,
+    "collaborator": AgentProfile.collaborator,
+}
 
 
 @dataclass
@@ -99,6 +307,7 @@ class SimAgent:
     stay_threshold: float = 0.65
     leave_threshold: float = -0.05
     switching_improvement_threshold: float = 0.55
+    cooldown_steps_remaining: int = 0
     total_moves: int = 0
     arrivals_step: int = 0
 

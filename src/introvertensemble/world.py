@@ -99,6 +99,18 @@ class LibraryWorld:
         occupied = sum(1 for seat in neighbors if self.occupancy[seat.id] is not None)
         return occupied / len(neighbors)
 
+    def immediate_neighbor_ratio(self, seat_id: str) -> float:
+        seat = self.spec.seats[seat_id]
+        radius = min(1.1, max(0.8, seat.neighbor_radius * 0.6))
+        return self.local_crowding_ratio(seat_id, radius=radius)
+
+    def zone_density(self, zone_id: str) -> float:
+        zone_seats = [seat for seat in self.spec.seats.values() if seat.zone_id == zone_id]
+        if not zone_seats:
+            return 0.0
+        occupied = sum(1 for seat in zone_seats if self.occupancy[seat.id] is not None)
+        return occupied / len(zone_seats)
+
     def active_spawn_window(self, hour: float) -> SpawnWindow:
         hour = hour % 24.0
         for window in self.spec.spawn_windows:

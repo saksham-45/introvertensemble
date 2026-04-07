@@ -4,7 +4,7 @@ import random
 from collections import Counter
 from dataclasses import dataclass
 
-from .agents import AgentProfile, SimAgent
+from .agents import PROFILE_REGISTRY, AgentProfile, SimAgent
 from .models import SpawnWindow
 from .scoring import SeatScorer
 from .world import LibraryWorld
@@ -17,10 +17,19 @@ class SimulationConfig:
     min_session_steps: int = 4
     max_session_steps: int = 16
     reseat_margin: float = 0.20
+    background_profile_mix: tuple[tuple[str, float], ...] = (
+        ("standard", 0.28),
+        ("quiet_seeker", 0.18),
+        ("comfort_seeker", 0.16),
+        ("outlet_seeker", 0.12),
+        ("opportunistic_reseater", 0.14),
+        ("collaborator", 0.12),
+    )
     focal_agent_enabled: bool = False
     focal_agent_entrance_id: str = "E1"
     focal_agent_session_steps: int = 20
     focal_agent_initial_seat_history: tuple[str, ...] = ()
+    focal_move_cooldown_steps: int = 4
 
 
 @dataclass(frozen=True)
@@ -82,6 +91,8 @@ class LibrarySimulation:
         departing_ids: list[str] = []
         for agent in self.agents.values():
             agent.session_steps_remaining -= 1
+            if agent.cooldown_steps_remaining > 0:
+                agent.cooldown_steps_remaining -= 1
             if agent.session_steps_remaining <= 0:
                 departing_ids.append(agent.id)
         for agent_id in departing_ids:
@@ -126,18 +137,23 @@ class LibrarySimulation:
         return whole + (1 if self.random.random() < frac else 0)
 
     def _create_agent(self) -> SimAgent:
-        profile = AgentProfile.introvert() if self.random.random() < self.config.introvert_share else AgentProfile.standard()
+        if self.random.random() < self.config.introvert_share:
+            profile = AgentProfile.introvert()
+        else:
+            profile = self._sample_background_profile()
         entrance_id = self._sample_entrance_id(self.current_hour)
         session_steps = self.random.randint(self.config.min_session_steps, self.config.max_session_steps)
         agent_id = f"agent_{self._next_agent_index:04d}"
         self._next_agent_index += 1
-        return SimAgent(
+        agent = SimAgent(
             id=agent_id,
             profile=profile,
             entrance_id=entrance_id,
             session_steps_remaining=session_steps,
             arrivals_step=self.step_index,
         )
+        self._apply_background_defaults(agent)
+        return agent
 
     def _create_focal_agent(self) -> SimAgent:
         agent_id = "focal_agent"
@@ -149,9 +165,9 @@ class LibrarySimulation:
             role="focal",
             local_search_radius=2.4,
             arrival_acceptability_threshold=0.20,
-            stay_threshold=1.10,
-            leave_threshold=0.10,
-            switching_improvement_threshold=0.70,
+            stay_threshold=2.60,
+            leave_threshold=1.80,
+            switching_improvement_threshold=0.55,
             arrivals_step=self.step_index,
         )
         for seat_id in self.config.focal_agent_initial_seat_history:
@@ -179,6 +195,48 @@ class LibrarySimulation:
                 return entrance_id
             last = entrance_id
         return last
+
+    def _sample_background_profile(self) -> AgentProfile:
+        total = sum(weight for _, weight in self.config.background_profile_mix)
+        if total <= 0:
+            return AgentProfile.standard()
+        roll = self.random.random() * total
+        cumulative = 0.0
+        selected = "standard"
+        for profile_name, weight in self.config.background_profile_mix:
+            cumulative += weight
+            if roll <= cumulative:
+                selected = profile_name
+                break
+        factory = PROFILE_REGISTRY.get(selected, AgentProfile.standard)
+        return factory()
+
+    def _apply_background_defaults(self, agent: SimAgent) -> None:
+        profile_name = agent.profile.name
+        if profile_name == "quiet_seeker":
+            agent.stay_threshold = 0.80
+            agent.leave_threshold = -0.10
+            agent.switching_improvement_threshold = 0.40
+        elif profile_name == "comfort_seeker":
+            agent.stay_threshold = 0.55
+            agent.leave_threshold = -0.18
+            agent.switching_improvement_threshold = 0.28
+        elif profile_name == "outlet_seeker":
+            agent.stay_threshold = 0.52
+            agent.leave_threshold = -0.12
+            agent.switching_improvement_threshold = 0.30
+        elif profile_name == "opportunistic_reseater":
+            agent.stay_threshold = 0.30
+            agent.leave_threshold = 0.10
+            agent.switching_improvement_threshold = 0.12
+        elif profile_name == "collaborator":
+            agent.stay_threshold = 0.36
+            agent.leave_threshold = -0.20
+            agent.switching_improvement_threshold = 0.16
+        elif profile_name == "introvert":
+            agent.stay_threshold = 0.78
+            agent.leave_threshold = -0.02
+            agent.switching_improvement_threshold = 0.42
 
     def _best_available_seat(
         self,
@@ -269,14 +327,21 @@ class LibrarySimulation:
     def _process_focal_reseat(self, agent: SimAgent) -> bool:
         current_seat_id = agent.current_seat_id
         assert current_seat_id is not None
+        if agent.cooldown_steps_remaining > 0:
+            return False
         current_score = self.scorer.score_seat(agent, current_seat_id).total
         if current_score >= agent.stay_threshold:
-            return False
-        if current_score > agent.leave_threshold:
             return False
 
         local_candidates = self._focal_local_candidates(agent)
         threshold = agent.switching_improvement_threshold
+        if current_score <= agent.leave_threshold:
+            fallback = self._best_focal_fallback(agent, local_candidates)
+            if fallback is None:
+                return False
+            self._move_agent(agent, fallback)
+            return True
+
         if local_candidates:
             local_best = self._best_available_seat(agent, candidate_seat_ids=local_candidates)
             if local_best is not None:
@@ -294,6 +359,22 @@ class LibrarySimulation:
         self._move_agent(agent, best_alt)
         return True
 
+    def _best_focal_fallback(self, agent: SimAgent, local_candidates: list[str]) -> str | None:
+        if local_candidates:
+            local_best = self._best_available_seat(agent, candidate_seat_ids=local_candidates)
+            if local_best is not None:
+                local_score = self.scorer.score_seat(agent, local_best).total
+                if local_score >= agent.arrival_acceptability_threshold:
+                    return local_best
+
+        best_alt = self._best_available_seat(agent)
+        if best_alt is None:
+            return None
+        best_score = self.scorer.score_seat(agent, best_alt).total
+        if best_score >= agent.arrival_acceptability_threshold:
+            return best_alt
+        return None
+
     def _move_agent(self, agent: SimAgent, new_seat_id: str) -> None:
         current_seat_id = agent.current_seat_id
         if current_seat_id is not None:
@@ -301,6 +382,8 @@ class LibrarySimulation:
         self.world.occupy_seat(new_seat_id, agent.id)
         agent.record_seat(new_seat_id, self.world.spec.seats[new_seat_id].zone_id)
         agent.total_moves += 1
+        if agent.role == "focal":
+            agent.cooldown_steps_remaining = self.config.focal_move_cooldown_steps
 
     def _remove_agent(self, agent_id: str) -> None:
         agent = self.agents.pop(agent_id)

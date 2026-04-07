@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from introvertensemble import LibrarySimulation, LibraryWorld, load_layout
 from introvertensemble.agents import AgentProfile, SimAgent
+from introvertensemble.metrics import run_episode
 from introvertensemble.scoring import SeatScorer
 from introvertensemble.simulation import SimulationConfig
 
@@ -178,6 +179,39 @@ class ScoringAndSimulationTests(unittest.TestCase):
         self.assertNotEqual(focal.current_seat_id, "DH-T1-02")
         self.assertIn(focal.current_seat_id, {"QR-DC-01", "QR-SC-05", "QR-SC-04"})
 
+    def test_focal_move_cooldown_prevents_immediate_repeated_reseating(self) -> None:
+        world = LibraryWorld(self.spec)
+        simulation = LibrarySimulation(
+            world,
+            config=SimulationConfig(
+                focal_agent_enabled=True,
+                focal_agent_initial_seat_history=("DH-T1-02", "DH-T1-02", "DH-T1-02"),
+                focal_agent_entrance_id="E4",
+                focal_agent_session_steps=16,
+                focal_move_cooldown_steps=3,
+            ),
+            seed=13,
+        )
+        focal = simulation.agents["focal_agent"]
+        focal.leave_threshold = 1.20
+        focal.switching_improvement_threshold = 0.10
+        for seat_id in ["DH-T1-01", "DH-T1-03", "DH-T1-04", "DH-T1-05", "DH-T1-06", "DH-T2-01", "DH-T2-03"]:
+            if world.occupancy[seat_id] is None:
+                world.occupy_seat(seat_id, f"neighbor_{seat_id}")
+        for seat_id in self.spec.seats:
+            if seat_id in {"DH-T1-02", "QR-DC-01", "QR-SC-05", "QR-SC-04"}:
+                continue
+            if world.occupancy[seat_id] is None:
+                world.occupy_seat(seat_id, f"block_{seat_id}")
+
+        simulation._sample_rate = lambda rate: 0  # type: ignore[method-assign]
+        simulation._process_reseating(world.active_spawn_window(10.0))
+        moved_to = focal.current_seat_id
+        first_moves = focal.total_moves
+        simulation._process_reseating(world.active_spawn_window(10.25))
+        self.assertEqual(focal.current_seat_id, moved_to)
+        self.assertEqual(focal.total_moves, first_moves)
+
     def test_forced_reseating_can_trigger(self) -> None:
         world = LibraryWorld(self.spec)
         simulation = LibrarySimulation(
@@ -207,6 +241,50 @@ class ScoringAndSimulationTests(unittest.TestCase):
         self.assertEqual(agent.current_seat_id, target_better)
         self.assertEqual(world.occupancy[target_better], agent.id)
         self.assertIsNone(world.occupancy["DH-T1-02"])
+
+    def test_collaborator_prefers_collaboration_over_quiet(self) -> None:
+        world = LibraryWorld(self.spec)
+        scorer = SeatScorer(world)
+        collaborator = SimAgent(
+            id="collab",
+            profile=AgentProfile.collaborator(),
+            entrance_id="E4",
+            session_steps_remaining=8,
+        )
+        discussion = scorer.score_seat(collaborator, "DH-T1-02", origin_entrance_id="E4").total
+        quiet = scorer.score_seat(collaborator, "QR-DC-01", origin_entrance_id="E4").total
+        self.assertGreater(discussion, quiet)
+
+    def test_background_profile_mix_can_force_single_archetype(self) -> None:
+        world = LibraryWorld(self.spec)
+        simulation = LibrarySimulation(
+            world,
+            config=SimulationConfig(
+                introvert_share=0.0,
+                background_profile_mix=(("collaborator", 1.0),),
+            ),
+            seed=5,
+        )
+        profiles = {simulation._create_agent().profile.name for _ in range(10)}
+        self.assertEqual(profiles, {"collaborator"})
+
+    def test_run_episode_emits_focal_metrics(self) -> None:
+        world = LibraryWorld(self.spec)
+        simulation = LibrarySimulation(
+            world,
+            config=SimulationConfig(
+                focal_agent_enabled=True,
+                focal_agent_initial_seat_history=("QR-SC-05", "QR-SC-05", "QR-SC-04"),
+                focal_agent_session_steps=20,
+            ),
+            seed=17,
+        )
+        metrics = run_episode(simulation, steps=16)
+        self.assertEqual(metrics.steps, 16)
+        self.assertTrue(metrics.focal_present)
+        self.assertIsNotNone(metrics.focal_average_score)
+        self.assertGreaterEqual(metrics.average_occupancy, 0.0)
+        self.assertLessEqual(metrics.peak_occupancy, len(self.spec.seats))
 
 
 if __name__ == "__main__":
