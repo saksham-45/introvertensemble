@@ -34,6 +34,7 @@ class SimulationConfig:
     focal_move_cooldown_steps: int = 4
     events_enabled: bool = True
     focal_agent_external_control: bool = False
+    focal_agent_never_departs: bool = False
 
 
 @dataclass(frozen=True)
@@ -107,9 +108,11 @@ class LibrarySimulation:
         for agent in self.agents.values():
             if agent.current_seat_id is not None:
                 agent.steps_in_current_seat += 1
-            agent.session_steps_remaining -= 1
             if agent.cooldown_steps_remaining > 0:
                 agent.cooldown_steps_remaining -= 1
+            if agent.role == "focal" and self.config.focal_agent_never_departs:
+                continue
+            agent.session_steps_remaining -= 1
             if agent.session_steps_remaining <= 0:
                 departing_ids.append(agent.id)
         for agent_id in departing_ids:

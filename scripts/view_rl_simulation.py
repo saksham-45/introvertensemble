@@ -17,7 +17,6 @@ from introvertensemble.viewer import LibraryViewer
 def main() -> None:
     parser = argparse.ArgumentParser(description="Visualize the trained PPO focal agent in the library.")
     parser.add_argument("--seed", type=int, default=42, help="Simulation seed.")
-    parser.add_argument("--session-steps", type=int, default=24, help="Focal agent session length.")
     parser.add_argument(
         "--model-path",
         type=Path,
@@ -48,20 +47,11 @@ def main() -> None:
     config = SimulationConfig(
         focal_agent_enabled=True,
         focal_agent_external_control=True,
-        focal_agent_session_steps=args.session_steps,
+        focal_agent_never_departs=True,
         events_enabled=True,
     )
     env = LibraryEnv(config=config, seed=args.seed)
     obs, _info = env.reset(seed=args.seed)
-
-    state = {
-        "obs": obs,
-        "reward": 0.0,
-        "action": 0,
-        "action_label": "stay",
-        "episode_reward": 0.0,
-        "done": False,
-    }
 
     action_labels = {
         0: "stay",
@@ -70,27 +60,23 @@ def main() -> None:
     }
 
     def rl_step():
-        if state["done"]:
-            return None
-
-        action, _ = model.predict(state["obs"], deterministic=True)
+        action, _ = model.predict(obs_container["value"], deterministic=True)
         action = int(action)
-        obs, reward, terminated, truncated, info = env.step(action)
+        next_obs, reward, _terminated, _truncated, info = env.step(action)
+        obs_container["value"] = next_obs
 
-        state["obs"] = obs
-        state["reward"] = reward
-        state["action"] = action
-        state["action_label"] = action_labels.get(action, str(action))
-        state["episode_reward"] += reward
-        state["done"] = terminated or truncated
+        focal_id = env.sim.focal_agent_id
+        focal_seat = info.get("focal_seat_id")
+        if focal_id and focal_id in env.sim.agents:
+            focal_seat = env.sim.agents[focal_id].current_seat_id
+        print(
+            f"step={info.get('step_index', '?'):02d} "
+            f"action={action_labels.get(action, action)} "
+            f"reward={reward:.2f} seat={focal_seat}"
+        )
+        return info.get("step_summary")
 
-        summary = info.get("step_summary")
-        if state["done"]:
-            print(
-                f"Episode finished: total_reward={state['episode_reward']:.2f} "
-                f"final_seat={info.get('focal_seat_id')}"
-            )
-        return summary
+    obs_container = {"value": obs}
 
     viewer = LibraryViewer(
         env.world,

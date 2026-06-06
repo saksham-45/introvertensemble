@@ -70,5 +70,19 @@ class TestLibraryEnv(unittest.TestCase):
         _, _, terminated, _, _ = env.step(0)
         self.assertTrue(terminated)
 
+    def test_focal_never_departs(self) -> None:
+        config = SimulationConfig(
+            focal_agent_session_steps=2,
+            focal_agent_never_departs=True,
+        )
+        env = LibraryEnv(config=config, seed=42)
+        env.reset(seed=100)
+        focal_id = env.sim.focal_agent_id
+
+        for _ in range(6):
+            _, _, terminated, _, _ = env.step(0)
+            self.assertFalse(terminated)
+            self.assertIn(focal_id, env.sim.agents)
+
 if __name__ == "__main__":
     unittest.main()

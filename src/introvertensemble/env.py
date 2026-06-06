@@ -72,6 +72,7 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
                 focal_move_cooldown_steps=config.focal_move_cooldown_steps,
                 events_enabled=config.events_enabled,
                 focal_agent_external_control=True,
+                focal_agent_never_departs=config.focal_agent_never_departs,
             )
             
         self.initial_seed = seed

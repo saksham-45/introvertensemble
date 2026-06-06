@@ -22,7 +22,7 @@ def main() -> None:
         config=SimulationConfig(
             focal_agent_enabled=True,
             focal_agent_initial_seat_history=("QR-SC-05", "QR-SC-05", "QR-SC-04"),
-            focal_agent_session_steps=240,
+            focal_agent_never_departs=True,
             events_enabled=True,
         ),
         seed=19,
