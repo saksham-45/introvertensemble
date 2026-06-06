@@ -232,7 +232,7 @@ class ScoringAndSimulationTests(unittest.TestCase):
 
     def test_focal_rejects_crowded_fallback_even_if_it_is_available(self) -> None:
         world = LibraryWorld(self.spec)
-        simulation = LibrarySimulation(world)
+        simulation = LibrarySimulation(world, config=SimulationConfig(focal_agent_enabled=False))
         focal = SimAgent(
             id="focal",
             profile=AgentProfile.focal_introvert(),
@@ -249,7 +249,7 @@ class ScoringAndSimulationTests(unittest.TestCase):
 
     def test_focal_does_not_make_small_same_zone_micro_move(self) -> None:
         world = LibraryWorld(self.spec)
-        simulation = LibrarySimulation(world)
+        simulation = LibrarySimulation(world, config=SimulationConfig(focal_agent_enabled=False))
         focal = SimAgent(
             id="focal",
             profile=AgentProfile.focal_introvert(),
@@ -276,7 +276,7 @@ class ScoringAndSimulationTests(unittest.TestCase):
 
     def test_focal_can_make_same_zone_move_when_rewarding_enough(self) -> None:
         world = LibraryWorld(self.spec)
-        simulation = LibrarySimulation(world)
+        simulation = LibrarySimulation(world, config=SimulationConfig(focal_agent_enabled=False))
         focal = SimAgent(
             id="focal",
             profile=AgentProfile.focal_introvert(),
@@ -343,7 +343,12 @@ class ScoringAndSimulationTests(unittest.TestCase):
         world = LibraryWorld(self.spec)
         simulation = LibrarySimulation(
             world,
-            config=SimulationConfig(step_minutes=15, introvert_share=1.0, reseat_margin=0.0),
+            config=SimulationConfig(
+                step_minutes=15,
+                introvert_share=1.0,
+                reseat_margin=0.0,
+                focal_agent_enabled=False,
+            ),
             seed=11,
         )
         agent = SimAgent(

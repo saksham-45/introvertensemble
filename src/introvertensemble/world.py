@@ -13,6 +13,8 @@ class LibraryWorld:
         self.occupancy: dict[str, str | None] = {seat_id: None for seat_id in spec.seats}
         self._adjacency = self._build_adjacency()
         self._dynamic_zone_layer_deltas: dict[str, dict[str, float]] = {}
+        self._shortest_path_cache: dict[tuple[str, str], float] = {}
+        self._precompute_all_shortest_paths()
 
     def _build_adjacency(self) -> dict[str, list[tuple[str, float]]]:
         adjacency: dict[str, list[tuple[str, float]]] = defaultdict(list)
@@ -21,6 +23,24 @@ class LibraryWorld:
             if edge.bidirectional:
                 adjacency[edge.target].append((edge.source, edge.cost))
         return dict(adjacency)
+
+    def _precompute_all_shortest_paths(self) -> None:
+        for start_node_id in self.spec.graph_nodes:
+            frontier: list[tuple[float, str]] = [(0.0, start_node_id)]
+            best_cost: dict[str, float] = {start_node_id: 0.0}
+
+            while frontier:
+                cost, node_id = heapq.heappop(frontier)
+                if cost > best_cost[node_id]:
+                    continue
+                for next_node_id, edge_cost in self._adjacency.get(node_id, []):
+                    next_cost = cost + edge_cost
+                    if next_cost < best_cost.get(next_node_id, math.inf):
+                        best_cost[next_node_id] = next_cost
+                        heapq.heappush(frontier, (next_cost, next_node_id))
+
+            for end_node_id, cost in best_cost.items():
+                self._shortest_path_cache[(start_node_id, end_node_id)] = cost
 
     def available_seats(self, zone_id: str | None = None) -> list[Seat]:
         seats = []
@@ -57,21 +77,10 @@ class LibraryWorld:
             raise KeyError(f"Unknown graph node {start_node_id}")
         if goal_node_id not in self.spec.graph_nodes:
             raise KeyError(f"Unknown graph node {goal_node_id}")
-        frontier: list[tuple[float, str]] = [(0.0, start_node_id)]
-        best_cost: dict[str, float] = {start_node_id: 0.0}
-
-        while frontier:
-            cost, node_id = heapq.heappop(frontier)
-            if node_id == goal_node_id:
-                return cost
-            if cost > best_cost[node_id]:
-                continue
-            for next_node_id, edge_cost in self._adjacency.get(node_id, []):
-                next_cost = cost + edge_cost
-                if next_cost < best_cost.get(next_node_id, math.inf):
-                    best_cost[next_node_id] = next_cost
-                    heapq.heappush(frontier, (next_cost, next_node_id))
-        raise ValueError(f"No path between {start_node_id} and {goal_node_id}")
+        cost = self._shortest_path_cache.get((start_node_id, goal_node_id))
+        if cost is None:
+            raise ValueError(f"No path between {start_node_id} and {goal_node_id}")
+        return cost
 
     def path_cost_from_entrance_to_seat(self, entrance_id: str, seat_id: str) -> float:
         entrance = self.spec.entrances[entrance_id]

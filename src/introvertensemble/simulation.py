@@ -27,12 +27,13 @@ class SimulationConfig:
         ("opportunistic_reseater", 0.14),
         ("collaborator", 0.12),
     )
-    focal_agent_enabled: bool = False
+    focal_agent_enabled: bool = True
     focal_agent_entrance_id: str = "E1"
     focal_agent_session_steps: int = 20
     focal_agent_initial_seat_history: tuple[str, ...] = ()
     focal_move_cooldown_steps: int = 4
     events_enabled: bool = True
+    focal_agent_external_control: bool = False
 
 
 @dataclass(frozen=True)
@@ -134,10 +135,11 @@ class LibrarySimulation:
 
         focal_candidate_ids = [agent_id for agent_id in candidate_ids if self.agents[agent_id].role == "focal"]
         background_candidate_ids = [agent_id for agent_id in candidate_ids if self.agents[agent_id].role != "focal"]
-        for agent_id in focal_candidate_ids:
-            agent = self.agents[agent_id]
-            if self._process_focal_reseat(agent):
-                reseats += 1
+        if not self.config.focal_agent_external_control:
+            for agent_id in focal_candidate_ids:
+                agent = self.agents[agent_id]
+                if self._process_focal_reseat(agent):
+                    reseats += 1
 
         self.random.shuffle(background_candidate_ids)
         for agent_id in background_candidate_ids[:reseat_budget]:

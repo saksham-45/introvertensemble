@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import pygame
@@ -75,11 +76,13 @@ class LibraryViewer:
         world: LibraryWorld,
         viewport: Viewport | None = None,
         simulation: LibrarySimulation | None = None,
+        step_hook: Callable[[], StepSummary | None] | None = None,
     ):
         self.world = world
         self.viewport = viewport or Viewport()
         self.spec = world.spec
         self.simulation = simulation
+        self.step_hook = step_hook
         self.feature_layer_name = "privacy"
         self.show_walk_graph = True
         self.show_labels = True
@@ -109,7 +112,10 @@ class LibraryViewer:
                 self._step_accumulator_ms += elapsed_ms
                 ms_per_step = 1000.0 / max(0.25, self.steps_per_second)
                 while self._step_accumulator_ms >= ms_per_step:
-                    self.last_summary = self.simulation.step()
+                    if self.step_hook is not None:
+                        self.last_summary = self.step_hook()
+                    else:
+                        self.last_summary = self.simulation.step()
                     self._step_accumulator_ms -= ms_per_step
 
             self._draw(screen)
@@ -136,7 +142,10 @@ class LibraryViewer:
         elif key == pygame.K_SPACE and self.simulation is not None:
             self.running_simulation = not self.running_simulation
         elif key == pygame.K_n and self.simulation is not None:
-            self.last_summary = self.simulation.step()
+            if self.step_hook is not None:
+                self.last_summary = self.step_hook()
+            else:
+                self.last_summary = self.simulation.step()
         elif key == pygame.K_UP and self.simulation is not None:
             self.steps_per_second = min(8.0, self.steps_per_second + 0.5)
         elif key == pygame.K_DOWN and self.simulation is not None:

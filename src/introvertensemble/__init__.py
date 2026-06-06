@@ -3,6 +3,7 @@ from .metrics import EpisodeMetrics, MetricsTracker, run_episode
 from .observations import FocalObservation, ObservationBuilder, SeatObservation
 from .simulation import LibrarySimulation
 from .world import LibraryWorld
+from .env import LibraryEnv
 
 __all__ = [
     "EpisodeMetrics",
@@ -14,4 +15,5 @@ __all__ = [
     "SeatObservation",
     "load_layout",
     "run_episode",
+    "LibraryEnv",
 ]
