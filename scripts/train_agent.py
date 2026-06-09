@@ -13,31 +13,45 @@ from introvertensemble import LibraryEnv
 from introvertensemble.simulation import SimulationConfig
 
 
-def make_env(seed: int, session_steps: int) -> LibraryEnv:
+def make_env(seed: int, session_steps: int, layout_names: list[str]) -> LibraryEnv:
     config = SimulationConfig(
         focal_agent_enabled=True,
         focal_agent_external_control=True,
         focal_agent_session_steps=session_steps,
         events_enabled=True,
     )
-    return LibraryEnv(config=config, seed=seed)
+    return LibraryEnv(layout_names=layout_names, config=config, seed=seed)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train a PPO agent on library_v1.")
+    parser = argparse.ArgumentParser(description="Train a PPO agent on multiple layouts.")
     parser.add_argument("--timesteps", type=int, default=80_000, help="Total training timesteps.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
     parser.add_argument("--session-steps", type=int, default=24, help="Focal agent session length in steps.")
     parser.add_argument(
+        "--train-layouts",
+        type=str,
+        nargs="+",
+        default=["library_v1", "library_v2_riverside", "library_v3_courtyard"],
+        help="List of layout names to train on (default: library_v1 library_v2_riverside library_v3_courtyard)",
+    )
+    parser.add_argument(
+        "--val-layouts",
+        type=str,
+        nargs="+",
+        default=["library_v1"],
+        help="List of layout names to validate on (default: library_v1)",
+    )
+    parser.add_argument(
         "--model-path",
         type=Path,
-        default=ROOT / "models" / "ppo_library_v1",
+        default=ROOT / "models" / "ppo_multi_layout",
         help="Path prefix for saved model (SB3 appends .zip).",
     )
     parser.add_argument(
         "--log-dir",
         type=Path,
-        default=ROOT / "logs" / "ppo_library_v1",
+        default=ROOT / "logs" / "ppo_multi_layout",
         help="TensorBoard / SB3 log directory.",
     )
     args = parser.parse_args()
@@ -55,8 +69,10 @@ def main() -> None:
     args.model_path.parent.mkdir(parents=True, exist_ok=True)
     args.log_dir.mkdir(parents=True, exist_ok=True)
 
-    train_env = Monitor(make_env(seed=args.seed, session_steps=args.session_steps))
-    eval_env = Monitor(make_env(seed=args.seed + 10_000, session_steps=args.session_steps))
+    train_env = Monitor(make_env(seed=args.seed, session_steps=args.session_steps, layout_names=args.train_layouts))
+    # For evaluation, we'll use the first validation layout (or default to library_v1 if none specified)
+    val_layouts = args.val_layouts if args.val_layouts else ["library_v1"]
+    eval_env = Monitor(make_env(seed=args.seed + 10_000, session_steps=args.session_steps, layout_names=val_layouts))
 
     model = PPO(
         "MlpPolicy",
