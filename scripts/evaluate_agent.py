@@ -255,7 +255,9 @@ def main() -> None:
         default=ROOT / "models" / "ppo_multi_layout.zip",
         help="Trained PPO model path.",
     )
+    args = parser.parse_args()
 
+    # Define policies
     def noop_policy(_env: LibraryEnv, _obs: np.ndarray) -> int:
         return 0
 
@@ -271,63 +273,131 @@ def main() -> None:
             try_move_focal_to_seat(env, best_seat_id)
         return 0
 
+    # Load trained PPO model if available
+    model_candidates = [
+        args.model_path,
+        args.model_path.parent / "best_model.zip",
+    ]
+    model_file = next((path for path in model_candidates if path.exists()), None)
+    trained_policy = None
+    if model_file is not None:
+        from stable_baselines3 import PPO
+        model = PPO.load(model_file)
+        print(f"Loaded trained model: {model_file}")
+        print()
+
+        def trained_policy_func(_env: LibraryEnv, obs: np.ndarray) -> int:
+            action, _ = model.predict(obs, deterministic=True)
+            return int(action)
+
+        trained_policy = trained_policy_func
+    else:
+        print(f"No trained model at {args.model_path}; skipping PPO evaluation.")
+        print("Train first with: ./run.sh train")
+        print()
+
+    # Build list of policies to evaluate
     env_policies: list[tuple[str, object]] = [
         ("Random", random_policy),
         ("No-op (stay put)", noop_policy),
         ("Greedy (top-10 candidates)", greedy_policy),
         ("Perfect-info oracle (all empty seats)", perfect_info_policy),
     ]
-
-    model_candidates = [
-        args.model_path,
-        args.model_path.parent / "best_model.zip",
-    ]
-    model_file = next((path for path in model_candidates if path.exists()), None)
-
-    if model_file is not None:
-        from stable_baselines3 import PPO
-
-        model = PPO.load(model_file)
-        print(f"Loaded trained model: {model_file}")
-        print()
-
-        def trained_policy(_env: LibraryEnv, obs: np.ndarray) -> int:
-            action, _ = model.predict(obs, deterministic=True)
-            return int(action)
-
+    if trained_policy is not None:
         env_policies.append(("Trained PPO", trained_policy))
-    else:
-        print(f"No trained model at {args.model_path}; skipping PPO evaluation.")
-        print("Train first with: ./run.sh train")
-        print()
 
-    print("Evaluating seat-selection policies on library_v1")
+    # We'll collect all episode results here
+    all_results: list[dict] = []
+
+    # For each layout, for each seed offset, for each policy, run episodes
+    for layout_idx, layout_name in enumerate(args.eval_layouts):
+        for seed_offset in range(args.num_seeds):
+            # Compute a base seed for this layout and seed offset
+            # We use a large multiplier to avoid overlap between layout_idx and seed_offset
+            base_seed = args.seed + layout_idx * 10000 + seed_offset * 1000
+            # Create an environment that uses only this layout (no randomization)
+            env_factory = lambda seed_val: make_env(seed_val, args.session_steps, [layout_name])
+            
+            for policy_name, policy_func in env_policies:
+                # For each episode in this configuration
+                for episode in range(args.episodes):
+                    # Seed for this episode: we want different episodes to have different seeds
+                    episode_seed = base_seed + episode
+                    env = env_factory(episode_seed)
+                    # Run the episode
+                    episode_result = run_env_episode(env, policy_func, episode_seed)
+                    # Convert to dict for storage
+                    result_dict = {
+                        "layout": layout_name,
+                        "policy": policy_name,
+                        "seed_offset": seed_offset,
+                        "episode": episode,
+                        "total_reward": episode_result.total_reward,
+                        "mean_reward": episode_result.mean_reward,
+                        "steps": episode_result.steps,
+                        "moves": episode_result.moves,
+                        "final_seat": episode_result.final_seat,
+                        "final_score": episode_result.final_score,
+                    }
+                    all_results.append(result_dict)
+
+    # Now we can summarize and print
+    # We'll summarize by layout and policy (averaging over seed offsets and episodes)
+    print("\nEvaluation Results")
+    print("=" * 60)
+    
+    # Group results by layout and policy
+    from collections import defaultdict
+    grouped = defaultdict(list)
+    for res in all_results:
+        key = (res["layout"], res["policy"])
+        grouped[key].append(res)
+    
+    # Compute summary statistics for each group
+    summary_rows = []
+    for (layout_name, policy_name), results in grouped.items():
+        rewards = [r["total_reward"] for r in results]
+        means = [r["mean_reward"] for r in results]
+        moves = [r["moves"] for r in results]
+        finals = [r["final_score"] for r in results]
+        
+        summary_rows.append({
+            "layout": layout_name,
+            "policy": policy_name,
+            "episodes": len(results),
+            "mean_total_reward": np.mean(rewards),
+            "std_total_reward": np.std(rewards),
+            "mean_step_reward": np.mean(means),
+            "std_step_reward": np.std(means),
+            "mean_moves": np.mean(moves),
+            "std_moves": np.std(moves),
+            "mean_final_score": np.mean(finals),
+            "std_final_score": np.std(finals),
+        })
+        
+        # Print a line for this group
+        print(f"{layout_name:15} | {policy_name:30} | "
+              f"Reward: {np.mean(rewards):6.2f} ± {np.std(rewards):5.2f} | "
+              f"Steps: {np.mean(means):5.3f} ± {np.std(means):4.3f} | "
+              f"Moves: {np.mean(moves):5.2f} ± {np.std(moves):4.2f} | "
+              f"Final Score: {np.mean(finals):5.2f} ± {np.std(finals):4.2f}")
+    
     print("-" * 60)
-    print(f"Episodes per policy: {args.episodes}")
-    print(f"Session length: {args.session_steps} steps")
-    print()
-
-    rankings: list[dict[str, float]] = []
-
-    for name, policy in env_policies:
-        random.seed(args.seed)
-        results = [
-            run_env_episode(
-                make_env(seed=args.seed, session_steps=args.session_steps),
-                policy,
-                seed=args.seed + episode,
-            )
-            for episode in range(args.episodes)
-        ]
-        rankings.append(summarize(name, results))
-
-    rule_based_results = [
-        run_rule_based_episode(seed=args.seed + episode, session_steps=args.session_steps)
-        for episode in range(args.episodes)
-    ]
-    rankings.append(summarize("Rule-based focal agent", rule_based_results))
-
-    print_ranking(rankings)
+    
+    # Export if requested
+    if args.export_csv:
+        import csv
+        with open(args.export_csv, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=all_results[0].keys() if all_results else [])
+            writer.writeheader()
+            writer.writerows(all_results)
+        print(f"Exported detailed results to {args.export_csv}")
+    
+    if args.export_json:
+        import json
+        with open(args.export_json, 'w') as f:
+            json.dump(all_results, f, indent=2)
+        print(f"Exported detailed results to {args.export_json}")
 
 
 if __name__ == "__main__":
