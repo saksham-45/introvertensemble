@@ -125,6 +125,31 @@ Evaluate generalization to an unseen layout (if library_v4_atrium was not used i
 ./run.sh eval --eval-layouts library_v4_atrium --num-seeds 3 --episodes 5
 ```
 
+## Sample Evaluation Results (2 seeds, 2 episodes)
+
+| Layout | Policy | Mean Reward ± Std | Mean Steps ± Std | Mean Moves ± Std | Final Score ± Std |
+|--------|--------|-------------------|------------------|------------------|-------------------|
+| library_v1 | Random | -2.84 ± 13.59 | -0.12 ± 0.57 | 5.75 ± 0.43 | -3.44 ± 0.94 |
+| library_v1 | No-op (stay put) | 39.68 ± 2.36 | 1.65 ± 0.10 | 0.00 ± 0.00 | 1.22 ± 0.00 |
+| library_v1 | Greedy (top-10 candidates) | 29.53 ± 18.42 | 1.23 ± 0.77 | 0.50 ± 0.87 | 0.38 ± 1.46 |
+| library_v1 | Perfect-info oracle | 29.53 ± 18.42 | 1.23 ± 0.77 | 0.50 ± 0.87 | 0.38 ± 1.46 |
+| library_v1 | **Trained PPO** | **45.43 ± 5.12** | **1.89 ± 0.21** | **2.50 ± 0.50** | **1.54 ± 0.14** |
+| library_v2_riverside | Random | 21.57 ± 7.42 | 0.90 ± 0.31 | 5.00 ± 0.00 | -2.21 ± 0.27 |
+| library_v2_riverside | No-op (stay put) | 76.63 ± 0.74 | 3.19 ± 0.03 | 0.00 ± 0.00 | 3.07 ± 0.22 |
+| library_v2_riverside | Greedy (top-10 candidates) | 76.63 ± 0.74 | 3.19 ± 0.03 | 0.00 ± 0.00 | 3.07 ± 0.22 |
+| library_v2_riverside | Perfect-info oracle | 76.63 ± 0.74 | 3.19 ± 0.03 | 0.00 ± 0.00 | 3.07 ± 0.22 |
+| library_v2_riverside | **Trained PPO** | **51.26 ± 16.97** | **2.14 ± 0.71** | **2.75 ± 0.43** | **0.46 ± 1.51** |
+| library_v3_courtyard | Random | 26.70 ± 3.05 | 1.11 ± 0.13 | 5.50 ± 0.50 | -0.42 ± 1.00 |
+| library_v3_courtyard | No-op (stay put) | 78.18 ± 1.15 | 3.26 ± 0.05 | 0.00 ± 0.00 | 3.19 ± 0.00 |
+| library_v3_courtyard | Greedy (top-10 candidates) | 78.18 ± 1.15 | 3.26 ± 0.05 | 0.00 ± 0.00 | 3.19 ± 0.00 |
+| library_v3_courtyard | Perfect-info oracle | 78.18 ± 1.15 | 3.26 ± 0.05 | 0.00 ± 0.00 | 3.19 ± 0.00 |
+| library_v3_courtyard | **Trained PPO** | **52.83 ± 12.12** | **2.20 ± 0.51** | **3.50 ± 0.50** | **1.04 ± 0.23** |
+| library_v4_atrium | Random | 27.69 ± 7.65 | 1.15 ± 0.32 | 5.25 ± 0.43 | -1.02 ± 1.28 |
+| library_v4_atrium | No-op (stay put) | 77.14 ± 0.76 | 3.21 ± 0.03 | 0.00 ± 0.00 | 3.10 ± 0.00 |
+| library_v4_atrium | Greedy (top-10 candidates) | 77.14 ± 0.76 | 3.21 ± 0.03 | 0.00 ± 0.00 | 3.10 ± 0.00 |
+| library_v4_atrium | Perfect-info oracle | 77.14 ± 0.76 | 3.21 ± 0.03 | 0.00 ± 0.00 | 3.10 ± 0.00 |
+| library_v4_atrium | **Trained PPO** | **57.76 ± 22.50** | **2.41 ± 0.94** | **3.25 ± 1.30** | **2.23 ± 1.73** |
+
 ## Project docs
 
 See [LIBRARY_MARL_RESEARCH_PLAN.md](LIBRARY_MARL_RESEARCH_PLAN.md) for the full research roadmap, terminology, and planned multi-layout / multi-agent extensions.
