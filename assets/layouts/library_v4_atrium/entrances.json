@@ -1,0 +1,38 @@
+[
+  {
+    "id": "E1",
+    "label": "West Arcade Entry",
+    "x": 1.2,
+    "y": 1.0,
+    "node_id": "n_e1",
+    "kind": "main",
+    "notes": "West Arcade Entry entry point."
+  },
+  {
+    "id": "E2",
+    "label": "Central Arcade Entry",
+    "x": 6.6,
+    "y": 0.9,
+    "node_id": "n_e2",
+    "kind": "main",
+    "notes": "Central Arcade Entry entry point."
+  },
+  {
+    "id": "E4",
+    "label": "East Arcade Entry",
+    "x": 17.6,
+    "y": 1.0,
+    "node_id": "n_e4",
+    "kind": "main",
+    "notes": "East Arcade Entry entry point."
+  },
+  {
+    "id": "F1",
+    "label": "North Quiet Entry",
+    "x": 11.6,
+    "y": 16.6,
+    "node_id": "n_f1",
+    "kind": "secondary",
+    "notes": "North Quiet Entry entry point."
+  }
+]

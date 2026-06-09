@@ -1,0 +1,38 @@
+[
+  {
+    "id": "E1",
+    "label": "West Gate",
+    "x": 1.8,
+    "y": 0.9,
+    "node_id": "n_e1",
+    "kind": "main",
+    "notes": "West Gate entry point."
+  },
+  {
+    "id": "E2",
+    "label": "South Central Gate",
+    "x": 10.9,
+    "y": 0.9,
+    "node_id": "n_e2",
+    "kind": "main",
+    "notes": "South Central Gate entry point."
+  },
+  {
+    "id": "E4",
+    "label": "Southeast Gate",
+    "x": 18.3,
+    "y": 0.9,
+    "node_id": "n_e4",
+    "kind": "main",
+    "notes": "Southeast Gate entry point."
+  },
+  {
+    "id": "F1",
+    "label": "North Terrace Entry",
+    "x": 17.1,
+    "y": 16.6,
+    "node_id": "n_f1",
+    "kind": "secondary",
+    "notes": "North Terrace Entry entry point."
+  }
+]

@@ -1,0 +1,65 @@
+{
+  "layout_id": "library_v3_courtyard",
+  "name": "Courtyard Ring Library",
+  "version": "0.2.0",
+  "description": "Auto-generated variant with randomized-but-planned geometry and flow (seed 367).",
+  "map": {
+    "width": 20.0,
+    "height": 17.0,
+    "unit": "meters",
+    "coordinate_origin": "bottom_left"
+  },
+  "files": {
+    "zones": "zones.json",
+    "seats": "seats.json",
+    "entrances": "entrances.json",
+    "walk_graph": "walk_graph.json",
+    "spawn_schedule": "spawn_schedule.json",
+    "feature_fields": "feature_fields.json"
+  },
+  "seat_type_weights": {
+    "quiet_carrel": 10,
+    "silent_carrel": 9,
+    "deep_carrel": 10,
+    "individual_desk": 5,
+    "shared_table": 3,
+    "lounge_chair": 3,
+    "high_desk": 3,
+    "booth": 5,
+    "conference_chair": 2
+  },
+  "obstacles": [
+    {
+      "id": "obs_stack_cluster",
+      "label": "Obs Stack Cluster",
+      "x1": 9.44,
+      "y1": 11.13,
+      "x2": 10.54,
+      "y2": 13.13
+    },
+    {
+      "id": "obs_help_desk",
+      "label": "Obs Help Desk",
+      "x1": 8.58,
+      "y1": 2.89,
+      "x2": 9.88,
+      "y2": 4.29
+    },
+    {
+      "id": "obs_service_kiosk",
+      "label": "Obs Service Kiosk",
+      "x1": 16.96,
+      "y1": 3.12,
+      "x2": 17.96,
+      "y2": 4.32
+    },
+    {
+      "id": "obs_conf_table",
+      "label": "Obs Conf Table",
+      "x1": 16.82,
+      "y1": 11.85,
+      "x2": 17.82,
+      "y2": 13.95
+    }
+  ]
+}

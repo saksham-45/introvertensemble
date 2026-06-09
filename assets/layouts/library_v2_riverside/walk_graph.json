@@ -1,0 +1,294 @@
+{
+  "nodes": [
+    {
+      "id": "n_e1",
+      "x": 1.8,
+      "y": 0.9,
+      "tags": [
+        "entrance"
+      ]
+    },
+    {
+      "id": "n_e2",
+      "x": 10.9,
+      "y": 0.9,
+      "tags": [
+        "entrance"
+      ]
+    },
+    {
+      "id": "n_e4",
+      "x": 18.3,
+      "y": 0.9,
+      "tags": [
+        "entrance"
+      ]
+    },
+    {
+      "id": "n_f1",
+      "x": 17.1,
+      "y": 16.6,
+      "tags": [
+        "entrance"
+      ]
+    },
+    {
+      "id": "n_entry",
+      "x": 3.2,
+      "y": 3.3,
+      "tags": [
+        "lounge"
+      ]
+    },
+    {
+      "id": "n_circulation",
+      "x": 11.3,
+      "y": 4.7,
+      "tags": [
+        "circulation"
+      ]
+    },
+    {
+      "id": "n_open_w",
+      "x": 2.4,
+      "y": 9.09,
+      "tags": [
+        "open_reading"
+      ]
+    },
+    {
+      "id": "n_open_e",
+      "x": 8.2,
+      "y": 10.27,
+      "tags": [
+        "open_reading"
+      ]
+    },
+    {
+      "id": "n_quiet",
+      "x": 12.8,
+      "y": 12.4,
+      "tags": [
+        "quiet_room"
+      ]
+    },
+    {
+      "id": "n_cafe",
+      "x": 17.5,
+      "y": 10.5,
+      "tags": [
+        "cafe"
+      ]
+    },
+    {
+      "id": "n_conference",
+      "x": 17.5,
+      "y": 14.3,
+      "tags": [
+        "conference"
+      ]
+    },
+    {
+      "id": "n_turnover",
+      "x": 7.7,
+      "y": 3.3,
+      "tags": [
+        "high_turnover"
+      ]
+    },
+    {
+      "id": "n_discussion",
+      "x": 17.3,
+      "y": 3.8,
+      "tags": [
+        "discussion"
+      ]
+    },
+    {
+      "id": "n_info",
+      "x": 14.1,
+      "y": 3.6,
+      "tags": [
+        "staff"
+      ]
+    },
+    {
+      "id": "n_hall_n",
+      "x": 10.63,
+      "y": 13.96,
+      "tags": [
+        "junction"
+      ]
+    },
+    {
+      "id": "n_hall_s",
+      "x": 10.25,
+      "y": 5.59,
+      "tags": [
+        "junction"
+      ]
+    },
+    {
+      "id": "n_bridge_w",
+      "x": 5.84,
+      "y": 7.31,
+      "tags": [
+        "junction"
+      ]
+    },
+    {
+      "id": "n_bridge_e",
+      "x": 13.65,
+      "y": 7.94,
+      "tags": [
+        "junction"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "n_e1",
+      "target": "n_entry",
+      "cost": 2.66,
+      "bidirectional": true
+    },
+    {
+      "source": "n_entry",
+      "target": "n_bridge_w",
+      "cost": 5.14,
+      "bidirectional": true
+    },
+    {
+      "source": "n_entry",
+      "target": "n_circulation",
+      "cost": 7.91,
+      "bidirectional": true
+    },
+    {
+      "source": "n_circulation",
+      "target": "n_e2",
+      "cost": 3.59,
+      "bidirectional": true
+    },
+    {
+      "source": "n_circulation",
+      "target": "n_info",
+      "cost": 3.07,
+      "bidirectional": true
+    },
+    {
+      "source": "n_info",
+      "target": "n_turnover",
+      "cost": 6.3,
+      "bidirectional": true
+    },
+    {
+      "source": "n_turnover",
+      "target": "n_e4",
+      "cost": 10.6,
+      "bidirectional": true
+    },
+    {
+      "source": "n_turnover",
+      "target": "n_discussion",
+      "cost": 10.15,
+      "bidirectional": true
+    },
+    {
+      "source": "n_discussion",
+      "target": "n_conference",
+      "cost": 10.94,
+      "bidirectional": true
+    },
+    {
+      "source": "n_conference",
+      "target": "n_cafe",
+      "cost": 4.09,
+      "bidirectional": true
+    },
+    {
+      "source": "n_cafe",
+      "target": "n_f1",
+      "cost": 6.7,
+      "bidirectional": true
+    },
+    {
+      "source": "n_bridge_w",
+      "target": "n_open_w",
+      "cost": 3.81,
+      "bidirectional": true
+    },
+    {
+      "source": "n_open_w",
+      "target": "n_open_e",
+      "cost": 6.07,
+      "bidirectional": true
+    },
+    {
+      "source": "n_open_e",
+      "target": "n_quiet",
+      "cost": 5.04,
+      "bidirectional": true
+    },
+    {
+      "source": "n_open_e",
+      "target": "n_bridge_e",
+      "cost": 5.81,
+      "bidirectional": true
+    },
+    {
+      "source": "n_bridge_e",
+      "target": "n_cafe",
+      "cost": 4.55,
+      "bidirectional": true
+    },
+    {
+      "source": "n_bridge_e",
+      "target": "n_turnover",
+      "cost": 7.51,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_s",
+      "target": "n_circulation",
+      "cost": 1.4,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_s",
+      "target": "n_bridge_w",
+      "cost": 4.97,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_s",
+      "target": "n_bridge_e",
+      "cost": 4.53,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_n",
+      "target": "n_open_e",
+      "cost": 4.78,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_n",
+      "target": "n_quiet",
+      "cost": 2.55,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_n",
+      "target": "n_conference",
+      "cost": 6.74,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_n",
+      "target": "n_cafe",
+      "cost": 8.37,
+      "bidirectional": true
+    }
+  ]
+}

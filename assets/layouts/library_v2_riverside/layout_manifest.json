@@ -1,0 +1,65 @@
+{
+  "layout_id": "library_v2_riverside",
+  "name": "Riverside Split-Flow Library",
+  "version": "0.2.0",
+  "description": "Auto-generated variant with randomized-but-planned geometry and flow (seed 211).",
+  "map": {
+    "width": 20.0,
+    "height": 17.0,
+    "unit": "meters",
+    "coordinate_origin": "bottom_left"
+  },
+  "files": {
+    "zones": "zones.json",
+    "seats": "seats.json",
+    "entrances": "entrances.json",
+    "walk_graph": "walk_graph.json",
+    "spawn_schedule": "spawn_schedule.json",
+    "feature_fields": "feature_fields.json"
+  },
+  "seat_type_weights": {
+    "quiet_carrel": 10,
+    "silent_carrel": 9,
+    "deep_carrel": 8,
+    "individual_desk": 5,
+    "shared_table": 5,
+    "lounge_chair": 2,
+    "high_desk": 3,
+    "booth": 5,
+    "conference_chair": 2
+  },
+  "obstacles": [
+    {
+      "id": "obs_stack_cluster",
+      "label": "Obs Stack Cluster",
+      "x1": 4.21,
+      "y1": 8.88,
+      "x2": 5.31,
+      "y2": 10.88
+    },
+    {
+      "id": "obs_help_desk",
+      "label": "Obs Help Desk",
+      "x1": 2.46,
+      "y1": 2.53,
+      "x2": 3.76,
+      "y2": 3.93
+    },
+    {
+      "id": "obs_service_kiosk",
+      "label": "Obs Service Kiosk",
+      "x1": 6.49,
+      "y1": 3.45,
+      "x2": 7.49,
+      "y2": 4.65
+    },
+    {
+      "id": "obs_conf_table",
+      "label": "Obs Conf Table",
+      "x1": 16.69,
+      "y1": 12.6,
+      "x2": 17.69,
+      "y2": 14.7
+    }
+  ]
+}

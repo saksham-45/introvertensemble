@@ -32,7 +32,7 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
 
     def __init__(
         self,
-        layout_name: str = "library_v1",
+        layout_names: str | list[str] = "library_v1",
         config: SimulationConfig | None = None,
         seed: int = 42,
     ):
@@ -41,11 +41,14 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
             
         super().__init__()
         
+        # Store layout names for randomization
+        self.layout_names = layout_names if isinstance(layout_names, list) else [layout_names]
+        self._current_layout_name = None
+        
         # Load layout spec
         from pathlib import Path
         ROOT = Path(__file__).resolve().parents[2]
-        layout_dir = ROOT / "assets" / "layouts" / layout_name
-        self.spec = load_layout(layout_dir)
+        self._layout_root = ROOT / "assets" / "layouts"
         
         # Default config with focal agent enabled and under external control
         if config is None:
@@ -82,6 +85,9 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
         self.obs_builder = None
         self.scorer = None
         
+        # Initialize with first layout
+        self._reset_layout(seed)
+        
         # Sort seat IDs deterministically
         self.seat_ids = sorted(list(self.spec.seats.keys()))
         self.num_seats = len(self.seat_ids)
@@ -110,6 +116,23 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
         
         self.reset(seed=seed)
 
+    def _reset_layout(self, seed: int | None = None) -> None:
+        """Reset to a layout, optionally using seed for deterministic selection."""
+        # Select layout randomly from the list, using seed for reproducibility
+        if self.layout_names:
+            # Use the provided seed or sim_seed for layout selection to ensure reproducibility
+            selector_seed = seed if seed is not None else self.sim_seed
+            local_random = np.random.RandomState(selector_seed)
+            layout_index = local_random.randint(0, len(self.layout_names))
+            self._current_layout_name = self.layout_names[layout_index]
+        else:
+            # Fallback to first layout if list is empty
+            self._current_layout_name = self.layout_names[0] if self.layout_names else "library_v1"
+        
+        # Load layout spec
+        layout_dir = self._layout_root / self._current_layout_name
+        self.spec = load_layout(layout_dir)
+
     def reset(
         self,
         seed: int | None = None,
@@ -120,6 +143,10 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
         else:
             self.sim_seed += 1
             
+        # Reset layout if we're using multiple layouts
+        if isinstance(self.layout_names, list) and len(self.layout_names) > 1:
+            self._reset_layout(seed)
+        
         self.world = LibraryWorld(self.spec)
         self.sim = LibrarySimulation(self.world, config=self.config, seed=self.sim_seed)
         self.obs_builder = ObservationBuilder(self.sim)

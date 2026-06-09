@@ -1,0 +1,38 @@
+[
+  {
+    "id": "E1",
+    "label": "Southwest Entry",
+    "x": 1.1,
+    "y": 1.2,
+    "node_id": "n_e1",
+    "kind": "main",
+    "notes": "Southwest Entry entry point."
+  },
+  {
+    "id": "E2",
+    "label": "South Atrium Entry",
+    "x": 8.6,
+    "y": 0.9,
+    "node_id": "n_e2",
+    "kind": "main",
+    "notes": "South Atrium Entry entry point."
+  },
+  {
+    "id": "E4",
+    "label": "Southeast Service Entry",
+    "x": 18.7,
+    "y": 1.0,
+    "node_id": "n_e4",
+    "kind": "main",
+    "notes": "Southeast Service Entry entry point."
+  },
+  {
+    "id": "F1",
+    "label": "North Skylight Entry",
+    "x": 10.2,
+    "y": 16.6,
+    "node_id": "n_f1",
+    "kind": "secondary",
+    "notes": "North Skylight Entry entry point."
+  }
+]

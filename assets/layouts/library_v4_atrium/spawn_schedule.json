@@ -1,0 +1,60 @@
+{
+  "time_windows": [
+    {
+      "id": "morning_open",
+      "start_hour": 8,
+      "end_hour": 10,
+      "arrival_rate_per_hour": 14.52,
+      "departure_rate_per_hour": 2.7,
+      "reseat_pressure": 0.41,
+      "entrance_weights": {
+        "E1": 0.431,
+        "E2": 0.304,
+        "E4": 0.186,
+        "F1": 0.079
+      }
+    },
+    {
+      "id": "midday_peak",
+      "start_hour": 10,
+      "end_hour": 14,
+      "arrival_rate_per_hour": 28.91,
+      "departure_rate_per_hour": 11.25,
+      "reseat_pressure": 0.55,
+      "entrance_weights": {
+        "E1": 0.296,
+        "E2": 0.342,
+        "E4": 0.21,
+        "F1": 0.152
+      }
+    },
+    {
+      "id": "afternoon_shift",
+      "start_hour": 14,
+      "end_hour": 18,
+      "arrival_rate_per_hour": 21.55,
+      "departure_rate_per_hour": 13.03,
+      "reseat_pressure": 0.57,
+      "entrance_weights": {
+        "E1": 0.247,
+        "E2": 0.281,
+        "E4": 0.285,
+        "F1": 0.187
+      }
+    },
+    {
+      "id": "evening_taper",
+      "start_hour": 18,
+      "end_hour": 22,
+      "arrival_rate_per_hour": 10.02,
+      "departure_rate_per_hour": 14.33,
+      "reseat_pressure": 0.31,
+      "entrance_weights": {
+        "E1": 0.284,
+        "E2": 0.262,
+        "E4": 0.304,
+        "F1": 0.15
+      }
+    }
+  ]
+}

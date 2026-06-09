@@ -1,0 +1,294 @@
+{
+  "nodes": [
+    {
+      "id": "n_e1",
+      "x": 1.2,
+      "y": 1.0,
+      "tags": [
+        "entrance"
+      ]
+    },
+    {
+      "id": "n_e2",
+      "x": 6.6,
+      "y": 0.9,
+      "tags": [
+        "entrance"
+      ]
+    },
+    {
+      "id": "n_e4",
+      "x": 17.6,
+      "y": 1.0,
+      "tags": [
+        "entrance"
+      ]
+    },
+    {
+      "id": "n_f1",
+      "x": 11.6,
+      "y": 16.6,
+      "tags": [
+        "entrance"
+      ]
+    },
+    {
+      "id": "n_entry",
+      "x": 2.8,
+      "y": 3.5,
+      "tags": [
+        "lounge"
+      ]
+    },
+    {
+      "id": "n_circulation",
+      "x": 7.1,
+      "y": 3.8,
+      "tags": [
+        "circulation"
+      ]
+    },
+    {
+      "id": "n_open_w",
+      "x": 2.4,
+      "y": 10.78,
+      "tags": [
+        "open_reading"
+      ]
+    },
+    {
+      "id": "n_open_e",
+      "x": 7.2,
+      "y": 11.06,
+      "tags": [
+        "open_reading"
+      ]
+    },
+    {
+      "id": "n_quiet",
+      "x": 11.3,
+      "y": 12.7,
+      "tags": [
+        "quiet_room"
+      ]
+    },
+    {
+      "id": "n_cafe",
+      "x": 15.3,
+      "y": 10.1,
+      "tags": [
+        "cafe"
+      ]
+    },
+    {
+      "id": "n_conference",
+      "x": 18.0,
+      "y": 12.0,
+      "tags": [
+        "conference"
+      ]
+    },
+    {
+      "id": "n_turnover",
+      "x": 14.4,
+      "y": 3.8,
+      "tags": [
+        "high_turnover"
+      ]
+    },
+    {
+      "id": "n_discussion",
+      "x": 17.8,
+      "y": 4.3,
+      "tags": [
+        "discussion"
+      ]
+    },
+    {
+      "id": "n_info",
+      "x": 10.9,
+      "y": 3.8,
+      "tags": [
+        "staff"
+      ]
+    },
+    {
+      "id": "n_hall_n",
+      "x": 10.67,
+      "y": 13.79,
+      "tags": [
+        "junction"
+      ]
+    },
+    {
+      "id": "n_hall_s",
+      "x": 9.24,
+      "y": 5.8,
+      "tags": [
+        "junction"
+      ]
+    },
+    {
+      "id": "n_bridge_w",
+      "x": 5.63,
+      "y": 8.77,
+      "tags": [
+        "junction"
+      ]
+    },
+    {
+      "id": "n_bridge_e",
+      "x": 13.84,
+      "y": 8.75,
+      "tags": [
+        "junction"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "n_e1",
+      "target": "n_entry",
+      "cost": 2.95,
+      "bidirectional": true
+    },
+    {
+      "source": "n_entry",
+      "target": "n_bridge_w",
+      "cost": 5.66,
+      "bidirectional": true
+    },
+    {
+      "source": "n_entry",
+      "target": "n_circulation",
+      "cost": 4.26,
+      "bidirectional": true
+    },
+    {
+      "source": "n_circulation",
+      "target": "n_e2",
+      "cost": 3.09,
+      "bidirectional": true
+    },
+    {
+      "source": "n_circulation",
+      "target": "n_info",
+      "cost": 3.68,
+      "bidirectional": true
+    },
+    {
+      "source": "n_info",
+      "target": "n_turnover",
+      "cost": 3.3,
+      "bidirectional": true
+    },
+    {
+      "source": "n_turnover",
+      "target": "n_e4",
+      "cost": 4.51,
+      "bidirectional": true
+    },
+    {
+      "source": "n_turnover",
+      "target": "n_discussion",
+      "cost": 3.43,
+      "bidirectional": true
+    },
+    {
+      "source": "n_discussion",
+      "target": "n_conference",
+      "cost": 7.77,
+      "bidirectional": true
+    },
+    {
+      "source": "n_conference",
+      "target": "n_cafe",
+      "cost": 3.56,
+      "bidirectional": true
+    },
+    {
+      "source": "n_cafe",
+      "target": "n_f1",
+      "cost": 7.52,
+      "bidirectional": true
+    },
+    {
+      "source": "n_bridge_w",
+      "target": "n_open_w",
+      "cost": 3.94,
+      "bidirectional": true
+    },
+    {
+      "source": "n_open_w",
+      "target": "n_open_e",
+      "cost": 5.1,
+      "bidirectional": true
+    },
+    {
+      "source": "n_open_e",
+      "target": "n_quiet",
+      "cost": 4.72,
+      "bidirectional": true
+    },
+    {
+      "source": "n_open_e",
+      "target": "n_bridge_e",
+      "cost": 7.57,
+      "bidirectional": true
+    },
+    {
+      "source": "n_bridge_e",
+      "target": "n_cafe",
+      "cost": 1.93,
+      "bidirectional": true
+    },
+    {
+      "source": "n_bridge_e",
+      "target": "n_turnover",
+      "cost": 5.35,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_s",
+      "target": "n_circulation",
+      "cost": 3.18,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_s",
+      "target": "n_bridge_w",
+      "cost": 4.79,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_s",
+      "target": "n_bridge_e",
+      "cost": 5.6,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_n",
+      "target": "n_open_e",
+      "cost": 4.42,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_n",
+      "target": "n_quiet",
+      "cost": 1.33,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_n",
+      "target": "n_conference",
+      "cost": 7.54,
+      "bidirectional": true
+    },
+    {
+      "source": "n_hall_n",
+      "target": "n_cafe",
+      "cost": 5.97,
+      "bidirectional": true
+    }
+  ]
+}

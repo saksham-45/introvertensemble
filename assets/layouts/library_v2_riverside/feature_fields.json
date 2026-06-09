@@ -1,0 +1,221 @@
+{
+  "layers": [
+    {
+      "name": "wifi_strength",
+      "zone_defaults": {
+        "z_entry_lounge_1": 0.769,
+        "z_high_turnover_1": 0.752,
+        "z_circulation_1": 0.788,
+        "z_staff_core_1": 0.916,
+        "z_discussion_room_1": 0.664,
+        "z_open_reading_1": 0.72,
+        "z_quiet_room_1": 0.739,
+        "z_cafe_pantry_1": 0.763,
+        "z_conference_room_1": 0.809
+      },
+      "hotspots": [
+        {
+          "id": "wifi_staff_boost",
+          "x": 13.39,
+          "y": 3.99,
+          "radius": 2.71,
+          "delta": 0.072
+        },
+        {
+          "id": "wifi_spine_boost",
+          "x": 11.67,
+          "y": 4.63,
+          "radius": 2.26,
+          "delta": 0.084
+        }
+      ]
+    },
+    {
+      "name": "static_noise",
+      "zone_defaults": {
+        "z_entry_lounge_1": 0.643,
+        "z_high_turnover_1": 0.777,
+        "z_circulation_1": 0.429,
+        "z_staff_core_1": 0.172,
+        "z_discussion_room_1": 0.798,
+        "z_open_reading_1": 0.435,
+        "z_quiet_room_1": 0.082,
+        "z_cafe_pantry_1": 0.761,
+        "z_conference_room_1": 0.856
+      },
+      "hotspots": [
+        {
+          "id": "noise_cafe_peak",
+          "x": 16.87,
+          "y": 10.96,
+          "radius": 2.14,
+          "delta": 0.158
+        },
+        {
+          "id": "noise_discussion_peak",
+          "x": 16.92,
+          "y": 3.01,
+          "radius": 2.25,
+          "delta": 0.11
+        }
+      ]
+    },
+    {
+      "name": "foot_traffic",
+      "zone_defaults": {
+        "z_entry_lounge_1": 0.797,
+        "z_high_turnover_1": 0.893,
+        "z_circulation_1": 0.295,
+        "z_staff_core_1": 0.119,
+        "z_discussion_room_1": 0.522,
+        "z_open_reading_1": 0.417,
+        "z_quiet_room_1": 0.073,
+        "z_cafe_pantry_1": 0.718,
+        "z_conference_room_1": 0.606
+      },
+      "hotspots": [
+        {
+          "id": "traffic_entry",
+          "x": 2.46,
+          "y": 3.89,
+          "radius": 1.74,
+          "delta": 0.17
+        },
+        {
+          "id": "traffic_turnover",
+          "x": 7.39,
+          "y": 3.32,
+          "radius": 2.48,
+          "delta": 0.243
+        },
+        {
+          "id": "traffic_north_gate",
+          "x": 16.87,
+          "y": 14.11,
+          "radius": 1.86,
+          "delta": 0.069
+        }
+      ]
+    },
+    {
+      "name": "interruption_risk",
+      "zone_defaults": {
+        "z_entry_lounge_1": 0.774,
+        "z_high_turnover_1": 0.98,
+        "z_circulation_1": 0.303,
+        "z_staff_core_1": 0.176,
+        "z_discussion_room_1": 0.799,
+        "z_open_reading_1": 0.307,
+        "z_quiet_room_1": 0.126,
+        "z_cafe_pantry_1": 0.764,
+        "z_conference_room_1": 0.77
+      },
+      "hotspots": [
+        {
+          "id": "interrupt_queue",
+          "x": 6.99,
+          "y": 2.95,
+          "radius": 2.2,
+          "delta": 0.218
+        },
+        {
+          "id": "interrupt_collab",
+          "x": 17.78,
+          "y": 3.57,
+          "radius": 2.34,
+          "delta": 0.188
+        }
+      ]
+    },
+    {
+      "name": "privacy",
+      "zone_defaults": {
+        "z_entry_lounge_1": 0.163,
+        "z_high_turnover_1": 0.124,
+        "z_circulation_1": 0.467,
+        "z_staff_core_1": 0.028,
+        "z_discussion_room_1": 0.182,
+        "z_open_reading_1": 0.451,
+        "z_quiet_room_1": 0.98,
+        "z_cafe_pantry_1": 0.263,
+        "z_conference_room_1": 0.148
+      },
+      "hotspots": [
+        {
+          "id": "privacy_quiet_bonus",
+          "x": 13.32,
+          "y": 13.14,
+          "radius": 2.76,
+          "delta": 0.036
+        },
+        {
+          "id": "privacy_open_penalty",
+          "x": 5.98,
+          "y": 9.6,
+          "radius": 1.99,
+          "delta": -0.116
+        }
+      ]
+    },
+    {
+      "name": "future_crowding_risk",
+      "zone_defaults": {
+        "z_entry_lounge_1": 0.664,
+        "z_high_turnover_1": 0.98,
+        "z_circulation_1": 0.634,
+        "z_staff_core_1": 0.046,
+        "z_discussion_room_1": 0.603,
+        "z_open_reading_1": 0.593,
+        "z_quiet_room_1": 0.24,
+        "z_cafe_pantry_1": 0.681,
+        "z_conference_room_1": 0.568
+      },
+      "hotspots": [
+        {
+          "id": "crowding_entry_wave",
+          "x": 3.76,
+          "y": 3.18,
+          "radius": 1.74,
+          "delta": 0.151
+        },
+        {
+          "id": "crowding_turnover_wave",
+          "x": 8.35,
+          "y": 3.54,
+          "radius": 1.86,
+          "delta": 0.155
+        }
+      ]
+    },
+    {
+      "name": "stability",
+      "zone_defaults": {
+        "z_entry_lounge_1": 0.379,
+        "z_high_turnover_1": 0.051,
+        "z_circulation_1": 0.584,
+        "z_staff_core_1": 0.766,
+        "z_discussion_room_1": 0.327,
+        "z_open_reading_1": 0.585,
+        "z_quiet_room_1": 0.886,
+        "z_cafe_pantry_1": 0.4,
+        "z_conference_room_1": 0.284
+      },
+      "hotspots": [
+        {
+          "id": "stable_quiet_bonus",
+          "x": 13.29,
+          "y": 12.88,
+          "radius": 2.38,
+          "delta": 0.02
+        },
+        {
+          "id": "stable_turnover_penalty",
+          "x": 8.13,
+          "y": 3.33,
+          "radius": 2.36,
+          "delta": -0.141
+        }
+      ]
+    }
+  ]
+}

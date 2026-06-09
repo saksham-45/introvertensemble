@@ -1,0 +1,1444 @@
+[
+  {
+    "id": "QR-QC-01",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "quiet_carrel",
+    "x": 11.49,
+    "y": 9.03,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.14,
+      "outlet": true,
+      "comfort": 0.83
+    }
+  },
+  {
+    "id": "QR-QC-02",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "quiet_carrel",
+    "x": 10.46,
+    "y": 9.16,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.13,
+      "outlet": true,
+      "comfort": 0.79
+    }
+  },
+  {
+    "id": "QR-QC-03",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "quiet_carrel",
+    "x": 11.63,
+    "y": 10.81,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.28,
+      "outlet": true,
+      "comfort": 0.8
+    }
+  },
+  {
+    "id": "QR-QC-04",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "quiet_carrel",
+    "x": 15.19,
+    "y": 14.04,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.48,
+      "outlet": false,
+      "comfort": 0.79
+    }
+  },
+  {
+    "id": "QR-QC-05",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "quiet_carrel",
+    "x": 10.34,
+    "y": 10.7,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.33,
+      "outlet": true,
+      "comfort": 0.8
+    }
+  },
+  {
+    "id": "QR-QC-06",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "quiet_carrel",
+    "x": 11.67,
+    "y": 13.94,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.49,
+      "outlet": true,
+      "comfort": 0.79
+    }
+  },
+  {
+    "id": "QR-QC-07",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "quiet_carrel",
+    "x": 15.3,
+    "y": 9.11,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.33,
+      "outlet": false,
+      "comfort": 0.82
+    }
+  },
+  {
+    "id": "QR-QC-08",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "quiet_carrel",
+    "x": 13.9,
+    "y": 12.48,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.37,
+      "outlet": true,
+      "comfort": 0.8
+    }
+  },
+  {
+    "id": "QR-SC-01",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "silent_carrel",
+    "x": 12.81,
+    "y": 14.03,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.54,
+      "outlet": true,
+      "comfort": 0.87
+    }
+  },
+  {
+    "id": "QR-SC-02",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "silent_carrel",
+    "x": 11.54,
+    "y": 12.39,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.4,
+      "outlet": true,
+      "comfort": 0.85
+    }
+  },
+  {
+    "id": "QR-SC-03",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "silent_carrel",
+    "x": 10.38,
+    "y": 14.01,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.43,
+      "outlet": true,
+      "comfort": 0.85
+    }
+  },
+  {
+    "id": "QR-SC-04",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "silent_carrel",
+    "x": 12.83,
+    "y": 10.67,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.29,
+      "outlet": true,
+      "comfort": 0.83
+    }
+  },
+  {
+    "id": "QR-SC-05",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "silent_carrel",
+    "x": 10.38,
+    "y": 15.69,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.62,
+      "outlet": true,
+      "comfort": 0.84
+    }
+  },
+  {
+    "id": "QR-SC-06",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "silent_carrel",
+    "x": 12.67,
+    "y": 9.27,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.24,
+      "outlet": false,
+      "comfort": 0.83
+    }
+  },
+  {
+    "id": "QR-SC-07",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "silent_carrel",
+    "x": 13.98,
+    "y": 13.99,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.44,
+      "outlet": false,
+      "comfort": 0.85
+    }
+  },
+  {
+    "id": "QR-SC-08",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "silent_carrel",
+    "x": 15.37,
+    "y": 12.32,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.45,
+    "features": {
+      "window_view": 0.44,
+      "outlet": true,
+      "comfort": 0.83
+    }
+  },
+  {
+    "id": "QR-DC-01",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "deep_carrel",
+    "x": 13.9,
+    "y": 10.64,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.5,
+    "features": {
+      "window_view": 0.25,
+      "outlet": true,
+      "comfort": 0.87
+    }
+  },
+  {
+    "id": "QR-DC-02",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "deep_carrel",
+    "x": 14.11,
+    "y": 9.17,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.5,
+    "features": {
+      "window_view": 0.34,
+      "outlet": true,
+      "comfort": 0.92
+    }
+  },
+  {
+    "id": "QR-DC-03",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "deep_carrel",
+    "x": 15.33,
+    "y": 10.89,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.5,
+    "features": {
+      "window_view": 0.35,
+      "outlet": true,
+      "comfort": 0.88
+    }
+  },
+  {
+    "id": "QR-DC-04",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "deep_carrel",
+    "x": 10.38,
+    "y": 12.47,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.5,
+    "features": {
+      "window_view": 0.44,
+      "outlet": true,
+      "comfort": 0.9
+    }
+  },
+  {
+    "id": "QR-DC-05",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "deep_carrel",
+    "x": 12.72,
+    "y": 12.5,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.5,
+    "features": {
+      "window_view": 0.35,
+      "outlet": true,
+      "comfort": 0.87
+    }
+  },
+  {
+    "id": "QR-DC-06",
+    "zone_id": "z_quiet_room_1",
+    "seat_type": "deep_carrel",
+    "x": 11.45,
+    "y": 15.77,
+    "access_node_id": "n_quiet",
+    "neighbor_radius": 1.5,
+    "features": {
+      "window_view": 0.55,
+      "outlet": true,
+      "comfort": 0.9
+    }
+  },
+  {
+    "id": "OR-ST-01",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 1.41,
+    "y": 10.94,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.56,
+      "outlet": true,
+      "comfort": 0.69
+    }
+  },
+  {
+    "id": "OR-ST-02",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 7.76,
+    "y": 11.07,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.31,
+      "outlet": true,
+      "comfort": 0.68
+    }
+  },
+  {
+    "id": "OR-ST-03",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 2.85,
+    "y": 7.82,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.53,
+      "outlet": false,
+      "comfort": 0.68
+    }
+  },
+  {
+    "id": "OR-ST-04",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 3.0,
+    "y": 10.97,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.48,
+      "outlet": true,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "OR-ST-05",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 1.23,
+    "y": 12.79,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.6,
+      "outlet": true,
+      "comfort": 0.66
+    }
+  },
+  {
+    "id": "OR-ST-06",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 7.76,
+    "y": 7.98,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.14,
+      "outlet": true,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "OR-ST-07",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 4.5,
+    "y": 9.58,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.44,
+      "outlet": false,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "OR-ST-08",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 6.13,
+    "y": 6.24,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.35,
+      "outlet": true,
+      "comfort": 0.7
+    }
+  },
+  {
+    "id": "OR-ST-09",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 9.31,
+    "y": 11.11,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.28,
+      "outlet": true,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "OR-ST-10",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 7.55,
+    "y": 9.5,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.18,
+      "outlet": false,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "OR-ST-11",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 9.13,
+    "y": 7.92,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.18,
+      "outlet": true,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "OR-ST-12",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 9.13,
+    "y": 6.28,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.33,
+      "outlet": true,
+      "comfort": 0.71
+    }
+  },
+  {
+    "id": "OR-ST-13",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 6.04,
+    "y": 8.06,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.24,
+      "outlet": false,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "OR-ST-14",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 2.81,
+    "y": 12.68,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.54,
+      "outlet": true,
+      "comfort": 0.66
+    }
+  },
+  {
+    "id": "OR-ST-15",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 1.43,
+    "y": 7.99,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.63,
+      "outlet": true,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "OR-ST-16",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "shared_table",
+    "x": 4.61,
+    "y": 7.82,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.33,
+      "outlet": false,
+      "comfort": 0.65
+    }
+  },
+  {
+    "id": "OR-ID-01",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 9.27,
+    "y": 9.59,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.26,
+      "outlet": true,
+      "comfort": 0.71
+    }
+  },
+  {
+    "id": "OR-ID-02",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 2.98,
+    "y": 6.31,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.43,
+      "outlet": true,
+      "comfort": 0.71
+    }
+  },
+  {
+    "id": "OR-ID-03",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 2.81,
+    "y": 9.41,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.51,
+      "outlet": false,
+      "comfort": 0.75
+    }
+  },
+  {
+    "id": "OR-ID-04",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 1.33,
+    "y": 6.44,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.58,
+      "outlet": true,
+      "comfort": 0.7
+    }
+  },
+  {
+    "id": "OR-ID-05",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 6.02,
+    "y": 9.63,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.33,
+      "outlet": true,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "OR-ID-06",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 4.63,
+    "y": 11.15,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.37,
+      "outlet": true,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "OR-ID-07",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 7.55,
+    "y": 6.36,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.23,
+      "outlet": true,
+      "comfort": 0.71
+    }
+  },
+  {
+    "id": "OR-ID-08",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 4.61,
+    "y": 6.22,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.43,
+      "outlet": true,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "OR-ID-09",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 1.34,
+    "y": 9.47,
+    "access_node_id": "n_open_e",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.61,
+      "outlet": true,
+      "comfort": 0.77
+    }
+  },
+  {
+    "id": "OR-ID-10",
+    "zone_id": "z_open_reading_1",
+    "seat_type": "individual_desk",
+    "x": 6.02,
+    "y": 11.09,
+    "access_node_id": "n_open_w",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.25,
+      "outlet": true,
+      "comfort": 0.74
+    }
+  },
+  {
+    "id": "CP-ID-01",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "individual_desk",
+    "x": 17.39,
+    "y": 8.91,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.52,
+      "outlet": true,
+      "comfort": 0.75
+    }
+  },
+  {
+    "id": "CP-ID-02",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "individual_desk",
+    "x": 18.75,
+    "y": 12.04,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.57,
+      "outlet": true,
+      "comfort": 0.73
+    }
+  },
+  {
+    "id": "CP-ID-03",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "individual_desk",
+    "x": 17.42,
+    "y": 10.43,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.5,
+      "outlet": false,
+      "comfort": 0.75
+    }
+  },
+  {
+    "id": "CP-ID-04",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "individual_desk",
+    "x": 16.02,
+    "y": 12.0,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.39,
+      "outlet": true,
+      "comfort": 0.76
+    }
+  },
+  {
+    "id": "CP-ID-05",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "individual_desk",
+    "x": 18.92,
+    "y": 10.52,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.65,
+    "features": {
+      "window_view": 0.61,
+      "outlet": true,
+      "comfort": 0.77
+    }
+  },
+  {
+    "id": "CP-LC-01",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "lounge_chair",
+    "x": 16.04,
+    "y": 10.64,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.38,
+      "outlet": false,
+      "comfort": 0.86
+    }
+  },
+  {
+    "id": "CP-LC-02",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "lounge_chair",
+    "x": 18.82,
+    "y": 8.84,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.57,
+      "outlet": false,
+      "comfort": 0.89
+    }
+  },
+  {
+    "id": "CP-LC-03",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "lounge_chair",
+    "x": 17.62,
+    "y": 12.04,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.46,
+      "outlet": false,
+      "comfort": 0.87
+    }
+  },
+  {
+    "id": "CP-LC-04",
+    "zone_id": "z_cafe_pantry_1",
+    "seat_type": "lounge_chair",
+    "x": 16.22,
+    "y": 9.04,
+    "access_node_id": "n_cafe",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.38,
+      "outlet": false,
+      "comfort": 0.89
+    }
+  },
+  {
+    "id": "CR-CC-01",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 18.98,
+    "y": 15.98,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.63,
+      "outlet": false,
+      "comfort": 0.65
+    }
+  },
+  {
+    "id": "CR-CC-02",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 16.99,
+    "y": 12.63,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.4,
+      "outlet": false,
+      "comfort": 0.6
+    }
+  },
+  {
+    "id": "CR-CC-03",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 16.22,
+    "y": 15.88,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.64,
+      "outlet": false,
+      "comfort": 0.64
+    }
+  },
+  {
+    "id": "CR-CC-04",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 17.05,
+    "y": 14.33,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.49,
+      "outlet": true,
+      "comfort": 0.59
+    }
+  },
+  {
+    "id": "CR-CC-05",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 18.87,
+    "y": 14.19,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.64,
+      "outlet": true,
+      "comfort": 0.64
+    }
+  },
+  {
+    "id": "CR-CC-06",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 18.09,
+    "y": 14.42,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.49,
+      "outlet": false,
+      "comfort": 0.63
+    }
+  },
+  {
+    "id": "CR-CC-07",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 17.16,
+    "y": 15.97,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.53,
+      "outlet": false,
+      "comfort": 0.63
+    }
+  },
+  {
+    "id": "CR-CC-08",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 16.1,
+    "y": 14.24,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.51,
+      "outlet": false,
+      "comfort": 0.66
+    }
+  },
+  {
+    "id": "CR-CC-09",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 18.91,
+    "y": 12.71,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.63,
+      "outlet": false,
+      "comfort": 0.6
+    }
+  },
+  {
+    "id": "CR-CC-10",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 17.91,
+    "y": 12.73,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.52,
+      "outlet": false,
+      "comfort": 0.62
+    }
+  },
+  {
+    "id": "CR-CC-11",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 17.85,
+    "y": 15.98,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.55,
+      "outlet": true,
+      "comfort": 0.6
+    }
+  },
+  {
+    "id": "CR-CC-12",
+    "zone_id": "z_conference_room_1",
+    "seat_type": "conference_chair",
+    "x": 16.17,
+    "y": 12.73,
+    "access_node_id": "n_conference",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.44,
+      "outlet": false,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "EL-LC-01",
+    "zone_id": "z_entry_lounge_1",
+    "seat_type": "lounge_chair",
+    "x": 5.12,
+    "y": 3.27,
+    "access_node_id": "n_entry",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.45,
+      "outlet": false,
+      "comfort": 0.86
+    }
+  },
+  {
+    "id": "EL-LC-02",
+    "zone_id": "z_entry_lounge_1",
+    "seat_type": "lounge_chair",
+    "x": 3.3,
+    "y": 5.3,
+    "access_node_id": "n_entry",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.48,
+      "outlet": true,
+      "comfort": 0.84
+    }
+  },
+  {
+    "id": "EL-LC-03",
+    "zone_id": "z_entry_lounge_1",
+    "seat_type": "lounge_chair",
+    "x": 1.23,
+    "y": 1.18,
+    "access_node_id": "n_entry",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.61,
+      "outlet": false,
+      "comfort": 0.88
+    }
+  },
+  {
+    "id": "EL-LC-04",
+    "zone_id": "z_entry_lounge_1",
+    "seat_type": "lounge_chair",
+    "x": 3.1,
+    "y": 3.23,
+    "access_node_id": "n_entry",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.48,
+      "outlet": false,
+      "comfort": 0.87
+    }
+  },
+  {
+    "id": "EL-LC-05",
+    "zone_id": "z_entry_lounge_1",
+    "seat_type": "lounge_chair",
+    "x": 3.18,
+    "y": 1.2,
+    "access_node_id": "n_entry",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.6,
+      "outlet": false,
+      "comfort": 0.85
+    }
+  },
+  {
+    "id": "EL-LC-06",
+    "zone_id": "z_entry_lounge_1",
+    "seat_type": "lounge_chair",
+    "x": 1.26,
+    "y": 3.38,
+    "access_node_id": "n_entry",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.64,
+      "outlet": false,
+      "comfort": 0.84
+    }
+  },
+  {
+    "id": "EL-LC-07",
+    "zone_id": "z_entry_lounge_1",
+    "seat_type": "lounge_chair",
+    "x": 1.1,
+    "y": 5.22,
+    "access_node_id": "n_entry",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.56,
+      "outlet": true,
+      "comfort": 0.85
+    }
+  },
+  {
+    "id": "EL-LC-08",
+    "zone_id": "z_entry_lounge_1",
+    "seat_type": "lounge_chair",
+    "x": 5.15,
+    "y": 1.3,
+    "access_node_id": "n_entry",
+    "neighbor_radius": 1.85,
+    "features": {
+      "window_view": 0.57,
+      "outlet": false,
+      "comfort": 0.89
+    }
+  },
+  {
+    "id": "CI-HD-01",
+    "zone_id": "z_circulation_1",
+    "seat_type": "high_desk",
+    "x": 12.56,
+    "y": 3.55,
+    "access_node_id": "n_circulation",
+    "neighbor_radius": 1.55,
+    "features": {
+      "window_view": 0.39,
+      "outlet": true,
+      "comfort": 0.65
+    }
+  },
+  {
+    "id": "CI-HD-02",
+    "zone_id": "z_circulation_1",
+    "seat_type": "high_desk",
+    "x": 10.06,
+    "y": 8.05,
+    "access_node_id": "n_circulation",
+    "neighbor_radius": 1.55,
+    "features": {
+      "window_view": 0.22,
+      "outlet": true,
+      "comfort": 0.65
+    }
+  },
+  {
+    "id": "CI-HD-03",
+    "zone_id": "z_circulation_1",
+    "seat_type": "high_desk",
+    "x": 10.1,
+    "y": 5.89,
+    "access_node_id": "n_circulation",
+    "neighbor_radius": 1.55,
+    "features": {
+      "window_view": 0.3,
+      "outlet": true,
+      "comfort": 0.61
+    }
+  },
+  {
+    "id": "CI-HD-04",
+    "zone_id": "z_circulation_1",
+    "seat_type": "high_desk",
+    "x": 12.48,
+    "y": 1.32,
+    "access_node_id": "n_circulation",
+    "neighbor_radius": 1.55,
+    "features": {
+      "window_view": 0.51,
+      "outlet": true,
+      "comfort": 0.6
+    }
+  },
+  {
+    "id": "CI-HD-05",
+    "zone_id": "z_circulation_1",
+    "seat_type": "high_desk",
+    "x": 10.14,
+    "y": 3.5,
+    "access_node_id": "n_circulation",
+    "neighbor_radius": 1.55,
+    "features": {
+      "window_view": 0.51,
+      "outlet": true,
+      "comfort": 0.59
+    }
+  },
+  {
+    "id": "CI-HD-06",
+    "zone_id": "z_circulation_1",
+    "seat_type": "high_desk",
+    "x": 12.45,
+    "y": 5.81,
+    "access_node_id": "n_circulation",
+    "neighbor_radius": 1.55,
+    "features": {
+      "window_view": 0.32,
+      "outlet": true,
+      "comfort": 0.61
+    }
+  },
+  {
+    "id": "CI-HD-07",
+    "zone_id": "z_circulation_1",
+    "seat_type": "high_desk",
+    "x": 10.02,
+    "y": 1.35,
+    "access_node_id": "n_circulation",
+    "neighbor_radius": 1.55,
+    "features": {
+      "window_view": 0.58,
+      "outlet": true,
+      "comfort": 0.63
+    }
+  },
+  {
+    "id": "HT-BT-01",
+    "zone_id": "z_high_turnover_1",
+    "seat_type": "booth",
+    "x": 7.73,
+    "y": 1.34,
+    "access_node_id": "n_turnover",
+    "neighbor_radius": 1.75,
+    "features": {
+      "window_view": 0.58,
+      "outlet": true,
+      "comfort": 0.73
+    }
+  },
+  {
+    "id": "HT-BT-02",
+    "zone_id": "z_high_turnover_1",
+    "seat_type": "booth",
+    "x": 5.99,
+    "y": 5.37,
+    "access_node_id": "n_turnover",
+    "neighbor_radius": 1.75,
+    "features": {
+      "window_view": 0.29,
+      "outlet": true,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "HT-BT-03",
+    "zone_id": "z_high_turnover_1",
+    "seat_type": "booth",
+    "x": 7.8,
+    "y": 3.17,
+    "access_node_id": "n_turnover",
+    "neighbor_radius": 1.75,
+    "features": {
+      "window_view": 0.49,
+      "outlet": false,
+      "comfort": 0.71
+    }
+  },
+  {
+    "id": "HT-BT-04",
+    "zone_id": "z_high_turnover_1",
+    "seat_type": "booth",
+    "x": 5.99,
+    "y": 1.18,
+    "access_node_id": "n_turnover",
+    "neighbor_radius": 1.75,
+    "features": {
+      "window_view": 0.56,
+      "outlet": false,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "HT-BT-05",
+    "zone_id": "z_high_turnover_1",
+    "seat_type": "booth",
+    "x": 9.44,
+    "y": 1.2,
+    "access_node_id": "n_turnover",
+    "neighbor_radius": 1.75,
+    "features": {
+      "window_view": 0.64,
+      "outlet": true,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "HT-BT-06",
+    "zone_id": "z_high_turnover_1",
+    "seat_type": "booth",
+    "x": 9.56,
+    "y": 3.37,
+    "access_node_id": "n_turnover",
+    "neighbor_radius": 1.75,
+    "features": {
+      "window_view": 0.45,
+      "outlet": false,
+      "comfort": 0.78
+    }
+  },
+  {
+    "id": "HT-BT-07",
+    "zone_id": "z_high_turnover_1",
+    "seat_type": "booth",
+    "x": 6.08,
+    "y": 3.44,
+    "access_node_id": "n_turnover",
+    "neighbor_radius": 1.75,
+    "features": {
+      "window_view": 0.4,
+      "outlet": false,
+      "comfort": 0.74
+    }
+  },
+  {
+    "id": "DH-ST-01",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 15.73,
+    "y": 2.89,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.48,
+      "outlet": true,
+      "comfort": 0.69
+    }
+  },
+  {
+    "id": "DH-ST-02",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 17.2,
+    "y": 6.28,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.41,
+      "outlet": true,
+      "comfort": 0.72
+    }
+  },
+  {
+    "id": "DH-ST-03",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 18.98,
+    "y": 1.44,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.52,
+      "outlet": true,
+      "comfort": 0.68
+    }
+  },
+  {
+    "id": "DH-ST-04",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 15.69,
+    "y": 1.46,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.49,
+      "outlet": true,
+      "comfort": 0.68
+    }
+  },
+  {
+    "id": "DH-ST-05",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 17.4,
+    "y": 1.37,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.57,
+      "outlet": false,
+      "comfort": 0.69
+    }
+  },
+  {
+    "id": "DH-ST-06",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 15.78,
+    "y": 4.61,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.34,
+      "outlet": true,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "DH-ST-07",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 18.95,
+    "y": 2.95,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.63,
+      "outlet": true,
+      "comfort": 0.71
+    }
+  },
+  {
+    "id": "DH-ST-08",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 17.41,
+    "y": 4.61,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.51,
+      "outlet": true,
+      "comfort": 0.69
+    }
+  },
+  {
+    "id": "DH-ST-09",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 18.78,
+    "y": 6.17,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.6,
+      "outlet": true,
+      "comfort": 0.67
+    }
+  },
+  {
+    "id": "DH-ST-10",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 17.38,
+    "y": 3.12,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.54,
+      "outlet": true,
+      "comfort": 0.7
+    }
+  },
+  {
+    "id": "DH-ST-11",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 15.86,
+    "y": 6.19,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.4,
+      "outlet": true,
+      "comfort": 0.7
+    }
+  },
+  {
+    "id": "DH-ST-12",
+    "zone_id": "z_discussion_room_1",
+    "seat_type": "shared_table",
+    "x": 18.85,
+    "y": 4.59,
+    "access_node_id": "n_discussion",
+    "neighbor_radius": 1.9,
+    "features": {
+      "window_view": 0.57,
+      "outlet": true,
+      "comfort": 0.73
+    }
+  }
+]

@@ -1,0 +1,65 @@
+{
+  "layout_id": "library_v4_atrium",
+  "name": "Atrium Corridor Library",
+  "version": "0.2.0",
+  "description": "Auto-generated variant with randomized-but-planned geometry and flow (seed 593).",
+  "map": {
+    "width": 20.0,
+    "height": 17.0,
+    "unit": "meters",
+    "coordinate_origin": "bottom_left"
+  },
+  "files": {
+    "zones": "zones.json",
+    "seats": "seats.json",
+    "entrances": "entrances.json",
+    "walk_graph": "walk_graph.json",
+    "spawn_schedule": "spawn_schedule.json",
+    "feature_fields": "feature_fields.json"
+  },
+  "seat_type_weights": {
+    "quiet_carrel": 10,
+    "silent_carrel": 10,
+    "deep_carrel": 9,
+    "individual_desk": 6,
+    "shared_table": 5,
+    "lounge_chair": 2,
+    "high_desk": 2,
+    "booth": 6,
+    "conference_chair": 1
+  },
+  "obstacles": [
+    {
+      "id": "obs_stack_cluster",
+      "label": "Obs Stack Cluster",
+      "x1": 4.92,
+      "y1": 9.47,
+      "x2": 6.02,
+      "y2": 11.47
+    },
+    {
+      "id": "obs_help_desk",
+      "label": "Obs Help Desk",
+      "x1": 2.81,
+      "y1": 3.13,
+      "x2": 4.11,
+      "y2": 4.53
+    },
+    {
+      "id": "obs_service_kiosk",
+      "label": "Obs Service Kiosk",
+      "x1": 13.43,
+      "y1": 2.96,
+      "x2": 14.43,
+      "y2": 4.16
+    },
+    {
+      "id": "obs_conf_table",
+      "label": "Obs Conf Table",
+      "x1": 18.0,
+      "y1": 10.87,
+      "x2": 19.0,
+      "y2": 12.97
+    }
+  ]
+}
