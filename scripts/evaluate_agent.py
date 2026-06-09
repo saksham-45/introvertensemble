@@ -28,14 +28,14 @@ class EpisodeResult:
     final_score: float
 
 
-def make_env(seed: int, session_steps: int) -> LibraryEnv:
+def make_env(seed: int, session_steps: int, layout_names: list[str]) -> LibraryEnv:
     config = SimulationConfig(
         focal_agent_enabled=True,
         focal_agent_external_control=True,
         focal_agent_session_steps=session_steps,
         events_enabled=True,
     )
-    return LibraryEnv(config=config, seed=seed)
+    return LibraryEnv(layout_names=layout_names, config=config, seed=seed)
 
 
 def focal_step_reward(env: LibraryEnv) -> tuple[float, str | None]:
@@ -227,12 +227,34 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42, help="Base evaluation seed.")
     parser.add_argument("--session-steps", type=int, default=24, help="Focal agent session length.")
     parser.add_argument(
+        "--eval-layouts",
+        type=str,
+        nargs="+",
+        default=["library_v1"],
+        help="List of layout names to evaluate on (default: library_v1)",
+    )
+    parser.add_argument(
+        "--num-seeds",
+        type=int,
+        default=1,
+        help="Number of different seeds to sweep for each layout (default: 1)",
+    )
+    parser.add_argument(
+        "--export-csv",
+        type=Path,
+        help="Export results to CSV file",
+    )
+    parser.add_argument(
+        "--export-json",
+        type=Path,
+        help="Export results to JSON file",
+    )
+    parser.add_argument(
         "--model-path",
         type=Path,
-        default=ROOT / "models" / "ppo_library_v1.zip",
+        default=ROOT / "models" / "ppo_multi_layout.zip",
         help="Trained PPO model path.",
     )
-    args = parser.parse_args()
 
     def noop_policy(_env: LibraryEnv, _obs: np.ndarray) -> int:
         return 0
