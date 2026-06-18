@@ -4,6 +4,7 @@ from .observations import FocalObservation, ObservationBuilder, SeatObservation
 from .simulation import LibrarySimulation
 from .world import LibraryWorld
 from .env import LibraryEnv
+from .marl_env import LibraryParallelEnv
 
 __all__ = [
     "EpisodeMetrics",
@@ -16,4 +17,5 @@ __all__ = [
     "load_layout",
     "run_episode",
     "LibraryEnv",
+    "LibraryParallelEnv",
 ]
