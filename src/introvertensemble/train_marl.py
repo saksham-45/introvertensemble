@@ -30,7 +30,7 @@ def make_env(env_config: dict):
     return LibraryParallelEnv(
         layout_names=env_config.get("layout_names", "library_v1"),
         initial_learning_agent_count=int(env_config.get("initial_learning_agent_count", 20)),
-        max_num_agents=int(env_config.get("max_num_agents", 200)),
+        max_learning_agents=int(env_config.get("max_learning_agents", 200)),
         max_episode_steps=int(env_config.get("max_episode_steps", 1000)),
         seed=int(env_config.get("seed", 42)),
     )
@@ -41,7 +41,7 @@ def build_config(args: argparse.Namespace) -> PPOConfig:
     env_config = {
         "layout_names": args.layout,
         "initial_learning_agent_count": initial_agents,
-        "max_num_agents": args.max_agents,
+        "max_learning_agents": args.max_agents,
         "max_episode_steps": args.max_episode_steps,
         "seed": 42,
     }

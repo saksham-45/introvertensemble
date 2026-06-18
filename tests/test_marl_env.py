@@ -26,7 +26,7 @@ class LibraryParallelEnvTests(unittest.TestCase):
             config=config,
             seed=7,
             initial_learning_agent_count=2,
-            max_num_agents=20,
+            max_learning_agents=20,
         )
         env.reset(seed=11)
         agents = env.agents[:2]
@@ -85,7 +85,7 @@ class LibraryParallelEnvTests(unittest.TestCase):
         except ImportError as exc:
             raise unittest.SkipTest("pettingzoo is not installed") from exc
 
-        env = LibraryParallelEnv(seed=3, initial_learning_agent_count=4, max_num_agents=30)
+        env = LibraryParallelEnv(seed=3, initial_learning_agent_count=4, max_learning_agents=30)
         parallel_api_test(env, num_cycles=20)
 
 

@@ -32,7 +32,7 @@ class LibraryParallelEnv(ParallelEnv if ParallelEnv is not object else object):
         config: Optional[SimulationConfig] = None,
         seed: int = 42,
         initial_learning_agent_count: int = 20,
-        max_num_agents: int = 200,
+        max_learning_agents: int = 200,
         max_episode_steps: int = 1000,
     ):
         super().__init__()
@@ -43,8 +43,8 @@ class LibraryParallelEnv(ParallelEnv if ParallelEnv is not object else object):
         self._current_layout_name = None
         self.sim_seed = seed
         self.max_episode_steps = max_episode_steps
-        self.max_num_agents = max(1, max_num_agents)
-        self.possible_agents = [f"agent_{index:04d}" for index in range(1, self.max_num_agents + 1)]
+        self._max_learning_agents = max(1, max_learning_agents)
+        self.possible_agents = [f"agent_{index:04d}" for index in range(1, self._max_learning_agents + 1)]
         self.config = self._build_config(config, initial_learning_agent_count)
 
         from pathlib import Path
