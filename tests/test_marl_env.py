@@ -51,7 +51,7 @@ class LibraryParallelEnvTests(unittest.TestCase):
         self.assertIsNotNone(target_seat_id)
 
         actions = {
-            agents[0]: env._target_seat_action(agents[0], target_seat_id) if hasattr(env, "_target_seat_action") else self._action_for_target(env, agents[0], target_seat_id),
+            agents[0]: self._action_for_target(env, agents[0], target_seat_id),
             agents[1]: self._action_for_target(env, agents[1], target_seat_id),
         }
         observations, rewards, terminations, truncations, infos = env.step(actions)
