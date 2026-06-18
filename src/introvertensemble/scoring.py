@@ -75,7 +75,7 @@ class SeatScorer:
             movement_cost = self.world.shortest_path_cost(current_access, seat.access_node_id) / self._max_path_cost
 
         dwell_bonus = 0.0
-        if agent.role == "focal" and seat_id == agent.current_seat_id:
+        if agent.role in {"focal", "learning"} and seat_id == agent.current_seat_id:
             dwell_bonus = min(0.18, 0.025 * agent.steps_in_current_seat)
 
         privacy = profile.privacy_weight * privacy_value
@@ -146,6 +146,19 @@ class SeatScorer:
             movement_penalty=movement_penalty,
             turnover_penalty=turnover_penalty,
         )
+
+    def _learning_local_crowding_ratio(self, seat_id: str) -> float:
+        if not self.learning_agent_ids:
+            return 0.0
+        neighbors = self.world.seat_neighbors(seat_id)
+        if not neighbors:
+            return 0.0
+        occupied_learning_neighbors = sum(
+            1
+            for seat in neighbors
+            if self.world.occupancy.get(seat.id) in self.learning_agent_ids
+        )
+        return occupied_learning_neighbors / len(neighbors)
 
     def fallback_acceptability_score(self, agent: SimAgent, seat_id: str) -> float:
         seat = self.world.spec.seats[seat_id]

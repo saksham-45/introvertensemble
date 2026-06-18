@@ -44,8 +44,10 @@ class ObservationBuilder:
         self.scorer = SeatScorer(simulation.world)
 
     def build_focal_observation(self) -> FocalObservation:
-        focal_id = self.simulation.focal_agent_id
-        if focal_id is None or focal_id not in self.simulation.agents:
+        return self.build_agent_observation(self.simulation.focal_agent_id)
+
+    def build_agent_observation(self, agent_id: str | None) -> FocalObservation:
+        if agent_id is None or agent_id not in self.simulation.agents:
             return FocalObservation(
                 step_index=self.simulation.step_index,
                 hour=self.simulation.current_hour,
@@ -61,7 +63,7 @@ class ObservationBuilder:
                 global_candidates=(),
             )
 
-        focal = self.simulation.agents[focal_id]
+        focal = self.simulation.agents[agent_id]
         current_seat = None
         current_score = None
         current_zone_id = None
@@ -71,7 +73,7 @@ class ObservationBuilder:
             current_seat = self._seat_observation(focal.current_seat_id, focal)
 
         nearby = []
-        for seat_id in self.simulation._focal_local_candidates(focal):
+        for seat_id in self._local_candidates(focal):
             if seat_id == focal.current_seat_id:
                 continue
             nearby.append(self._seat_observation(seat_id, focal))
@@ -102,6 +104,45 @@ class ObservationBuilder:
             nearby_candidates=tuple(nearby[: self.top_k]),
             global_candidates=tuple(global_candidates[: self.top_k]),
         )
+
+    def _local_candidates(self, agent) -> list[str]:
+        candidates: list[str] = []
+        if agent.current_seat_id is not None:
+            current_seat = self.simulation.world.spec.seats[agent.current_seat_id]
+            for seat in self.simulation.world.spec.seats.values():
+                if self.simulation.world.occupancy[seat.id] is not None:
+                    continue
+                distance = ((seat.x - current_seat.x) ** 2 + (seat.y - current_seat.y) ** 2) ** 0.5
+                if distance <= agent.local_search_radius:
+                    candidates.append(seat.id)
+            return self._dedupe(candidates)
+
+        preferred_seat_id = agent.dominant_seat_id()
+        preferred_zone_id = agent.dominant_zone_id()
+        if preferred_seat_id is not None and preferred_seat_id in self.simulation.world.spec.seats:
+            preferred_seat = self.simulation.world.spec.seats[preferred_seat_id]
+            for seat in self.simulation.world.spec.seats.values():
+                if self.simulation.world.occupancy[seat.id] is not None:
+                    continue
+                distance = ((seat.x - preferred_seat.x) ** 2 + (seat.y - preferred_seat.y) ** 2) ** 0.5
+                if distance <= agent.local_search_radius:
+                    candidates.append(seat.id)
+        elif preferred_zone_id is not None:
+            candidates.extend(
+                seat.id
+                for seat in self.simulation.world.available_seats(preferred_zone_id)
+            )
+
+        return self._dedupe(candidates)
+
+    def _dedupe(self, candidates: list[str]) -> list[str]:
+        deduped: list[str] = []
+        seen: set[str] = set()
+        for seat_id in candidates:
+            if seat_id not in seen:
+                deduped.append(seat_id)
+                seen.add(seat_id)
+        return deduped
 
     def _seat_observation(self, seat_id: str, agent) -> SeatObservation:
         seat = self.simulation.world.spec.seats[seat_id]
