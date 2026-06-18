@@ -26,15 +26,20 @@ class SeatScoreBreakdown:
     noise_penalty: float
     interruption_penalty: float
     future_crowding_penalty: float
+    learning_cluster_penalty: float
     movement_penalty: float
     turnover_penalty: float
 
 
 class SeatScorer:
-    def __init__(self, world: LibraryWorld):
+    def __init__(self, world: LibraryWorld, learning_agent_ids: set[str] | None = None):
         self.world = world
+        self.learning_agent_ids = learning_agent_ids or set()
         self._max_seat_weight = max(world.spec.seat_type_weights.values(), default=1)
         self._max_path_cost = math.dist((0.0, 0.0), (world.spec.bounds.width, world.spec.bounds.height))
+
+    def set_learning_agents(self, agent_ids: set[str]) -> None:
+        self.learning_agent_ids = set(agent_ids)
 
     def score_seat(self, agent: SimAgent, seat_id: str, origin_entrance_id: str | None = None) -> SeatScoreBreakdown:
         seat = self.world.spec.seats[seat_id]
@@ -59,6 +64,7 @@ class SeatScorer:
 
         immediate_neighbor_ratio = self.world.immediate_neighbor_ratio(seat_id)
         local_cluster_ratio = self.world.local_crowding_ratio(seat_id)
+        learning_cluster_ratio = self._learning_local_crowding_ratio(seat_id)
         zone_density = self.world.zone_density(zone_id)
         turnover_penalty_value = 1.0 - stability_value
 
@@ -82,12 +88,15 @@ class SeatScorer:
         seat_type = profile.seat_type_bias * seat_type_value
         seat_type_preference_bonus = profile.seat_type_preferences.get(seat.seat_type, 0.0)
 
-        immediate_weight = 1.15 if agent.role == "focal" else 0.90
-        local_weight = 0.70 if agent.role == "focal" else 0.55
-        zone_weight = 0.28 if agent.role == "focal" else 0.20
+        is_controlled_agent = agent.role in {"focal", "learning"}
+        immediate_weight = 1.15 if is_controlled_agent else 0.90
+        local_weight = 0.70 if is_controlled_agent else 0.55
+        zone_weight = 0.28 if is_controlled_agent else 0.20
+        learning_weight = 0.35 if is_controlled_agent else 0.20
         immediate_neighbor_penalty = profile.crowd_intolerance * immediate_weight * immediate_neighbor_ratio
         local_cluster_penalty = profile.crowd_intolerance * local_weight * local_cluster_ratio
         zone_crowding_penalty = profile.crowd_intolerance * zone_weight * zone_density
+        learning_cluster_penalty = profile.crowd_intolerance * learning_weight * learning_cluster_ratio
         noise_penalty = profile.noise_sensitivity * noise_value
         interruption_penalty = profile.interruption_sensitivity * interruption_value
         future_crowding_penalty = profile.future_crowding_sensitivity * future_crowding_value
@@ -111,6 +120,7 @@ class SeatScorer:
             - noise_penalty
             - interruption_penalty
             - future_crowding_penalty
+            - learning_cluster_penalty
             - movement_penalty
             - turnover_penalty
         )
@@ -132,6 +142,7 @@ class SeatScorer:
             noise_penalty=noise_penalty,
             interruption_penalty=interruption_penalty,
             future_crowding_penalty=future_crowding_penalty,
+            learning_cluster_penalty=learning_cluster_penalty,
             movement_penalty=movement_penalty,
             turnover_penalty=turnover_penalty,
         )

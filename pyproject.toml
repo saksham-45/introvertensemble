@@ -23,6 +23,10 @@ rl = [
   "tqdm>=4.66",
   "rich>=13.0",
 ]
+marl = [
+  "pettingzoo>=1.24",
+  "ray[rllib]>=2.9",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

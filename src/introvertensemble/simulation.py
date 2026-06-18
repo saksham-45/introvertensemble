@@ -28,13 +28,24 @@ class SimulationConfig:
         ("collaborator", 0.12),
     )
     focal_agent_enabled: bool = True
+    focal_agent_count: int = 1
     focal_agent_entrance_id: str = "E1"
     focal_agent_session_steps: int = 20
     focal_agent_initial_seat_history: tuple[str, ...] = ()
     focal_move_cooldown_steps: int = 4
+    learning_agent_count: int = 0
+    learning_agent_session_steps: int = 16
     events_enabled: bool = True
     focal_agent_external_control: bool = False
     focal_agent_never_departs: bool = False
+    all_agents_learning: bool = False
+    marl_population_mix: tuple[tuple[str, float], ...] = (
+        ("standard", 0.70),
+        ("extrovert", 0.10),
+        ("introvert", 0.10),
+        ("neutral", 0.05),
+        ("antisocial", 0.05),
+    )
 
 
 @dataclass(frozen=True)
@@ -66,10 +77,15 @@ class LibrarySimulation:
         self._schedule_start_hour = min(window.start_hour for window in world.spec.spawn_windows)
         self._schedule_end_hour = max(window.end_hour for window in world.spec.spawn_windows)
         self.focal_agent_id: str | None = None
+        self.focal_agent_ids: list[str] = []
+        self.learning_agent_ids: list[str] = []
         self.event_engine: EventEngine | None = EventEngine(seed=seed) if self.config.events_enabled else None
         self.last_event_summary: EventStepSummary | None = None
         if self.config.focal_agent_enabled:
-            self._create_focal_agent()
+            self._create_focal_agents()
+        if self.config.learning_agent_count > 0:
+            for _ in range(self.config.learning_agent_count):
+                self._create_initial_learning_agent()
 
     def step(self) -> StepSummary:
         self._step_events()
@@ -117,6 +133,7 @@ class LibrarySimulation:
                 departing_ids.append(agent.id)
         for agent_id in departing_ids:
             self._remove_agent(agent_id)
+        self._refresh_agent_id_lists()
         return len(departing_ids)
 
     def _spawn_arrivals(self, window: SpawnWindow) -> int:
@@ -127,6 +144,7 @@ class LibrarySimulation:
             if seat_id is None:
                 continue
             self.agents[agent.id] = agent
+            self._refresh_agent_id_lists()
             self.world.occupy_seat(seat_id, agent.id)
             agent.record_seat(seat_id, self.world.spec.seats[seat_id].zone_id)
         return arrivals
@@ -158,10 +176,12 @@ class LibrarySimulation:
         return whole + (1 if self.random.random() < frac else 0)
 
     def _create_agent(self) -> SimAgent:
-        if self.random.random() < self.config.introvert_share:
+        if self.config.all_agents_learning:
+            profile = self._sample_profile_from_mix(self.config.marl_population_mix)
+        elif self.random.random() < self.config.introvert_share:
             profile = AgentProfile.introvert()
         else:
-            profile = self._sample_background_profile()
+            profile = self._sample_profile_from_mix(self.config.background_profile_mix)
         entrance_id = self._sample_entrance_id(self.current_hour)
         session_steps = self.random.randint(self.config.min_session_steps, self.config.max_session_steps)
         agent_id = f"agent_{self._next_agent_index:04d}"
@@ -171,13 +191,22 @@ class LibrarySimulation:
             profile=profile,
             entrance_id=entrance_id,
             session_steps_remaining=session_steps,
+            role="learning" if self.config.all_agents_learning else "background",
             arrivals_step=self.step_index,
         )
         self._apply_background_defaults(agent)
         return agent
 
-    def _create_focal_agent(self) -> SimAgent:
-        agent_id = "focal_agent"
+    def _create_focal_agents(self) -> list[SimAgent]:
+        count = max(1, self.config.focal_agent_count)
+        created: list[SimAgent] = []
+        for index in range(count):
+            agent_id = "focal_agent" if count == 1 else f"focal_agent_{index + 1:02d}"
+            created.append(self._create_focal_agent(agent_id=agent_id))
+        self._refresh_agent_id_lists()
+        return created
+
+    def _create_focal_agent(self, agent_id: str = "focal_agent") -> SimAgent:
         focal = SimAgent(
             id=agent_id,
             profile=AgentProfile.focal_introvert(),
@@ -202,8 +231,24 @@ class LibrarySimulation:
             self.world.occupy_seat(seat_id, focal.id)
             focal.record_seat(seat_id, self.world.spec.seats[seat_id].zone_id)
         self.agents[focal.id] = focal
-        self.focal_agent_id = focal.id
         return focal
+
+    def _create_initial_learning_agent(self) -> SimAgent:
+        agent = self._create_agent()
+        agent.role = "learning"
+        agent.session_steps_remaining = self.config.learning_agent_session_steps
+        seat_id = self._choose_arrival_seat(agent)
+        if seat_id is not None:
+            self.world.occupy_seat(seat_id, agent.id)
+            agent.record_seat(seat_id, self.world.spec.seats[seat_id].zone_id)
+        self.agents[agent.id] = agent
+        self._refresh_agent_id_lists()
+        return agent
+
+    def _refresh_agent_id_lists(self) -> None:
+        self.focal_agent_ids = [agent_id for agent_id, agent in self.agents.items() if agent.role == "focal"]
+        self.learning_agent_ids = [agent_id for agent_id, agent in self.agents.items() if agent.role in {"focal", "learning"}]
+        self.focal_agent_id = self.focal_agent_ids[0] if self.focal_agent_ids else None
 
     def _sample_entrance_id(self, hour: float) -> str:
         weights = self.world.normalized_entrance_weights(hour)
@@ -217,14 +262,14 @@ class LibrarySimulation:
             last = entrance_id
         return last
 
-    def _sample_background_profile(self) -> AgentProfile:
-        total = sum(weight for _, weight in self.config.background_profile_mix)
+    def _sample_profile_from_mix(self, mix: tuple[tuple[str, float], ...]) -> AgentProfile:
+        total = sum(weight for _, weight in mix)
         if total <= 0:
             return AgentProfile.standard()
         roll = self.random.random() * total
         cumulative = 0.0
         selected = "standard"
-        for profile_name, weight in self.config.background_profile_mix:
+        for profile_name, weight in mix:
             cumulative += weight
             if roll <= cumulative:
                 selected = profile_name
@@ -258,6 +303,18 @@ class LibrarySimulation:
             agent.stay_threshold = 0.78
             agent.leave_threshold = -0.02
             agent.switching_improvement_threshold = 0.42
+        elif profile_name == "extrovert":
+            agent.stay_threshold = 0.42
+            agent.leave_threshold = -0.28
+            agent.switching_improvement_threshold = 0.10
+        elif profile_name == "neutral":
+            agent.stay_threshold = 0.65
+            agent.leave_threshold = -0.05
+            agent.switching_improvement_threshold = 0.35
+        elif profile_name == "antisocial":
+            agent.stay_threshold = 0.82
+            agent.leave_threshold = 0.10
+            agent.switching_improvement_threshold = 0.50
 
     def _best_available_seat(
         self,
@@ -452,6 +509,39 @@ class LibrarySimulation:
             return 0.30
         return 0.10
 
+    def resolve_seat_claims(self, claims: dict[str, str]) -> dict[str, float]:
+        rewards: dict[str, float] = {}
+        unoccupied_claims: dict[str, list[str]] = {}
+
+        for agent_id, seat_id in claims.items():
+            agent = self.agents.get(agent_id)
+            if agent is None or seat_id not in self.world.spec.seats:
+                rewards[agent_id] = rewards.get(agent_id, 0.0) - 1.0
+                continue
+            if agent.cooldown_steps_remaining > 0:
+                continue
+            if self.world.occupancy.get(seat_id) is not None:
+                rewards[agent_id] = rewards.get(agent_id, 0.0) - 1.0
+                continue
+            if seat_id == agent.current_seat_id:
+                continue
+            unoccupied_claims.setdefault(seat_id, []).append(agent_id)
+
+        winners: dict[str, str] = {}
+        for seat_id, agent_ids in unoccupied_claims.items():
+            if len(agent_ids) == 1:
+                winners[agent_ids[0]] = seat_id
+                continue
+            self.random.shuffle(agent_ids)
+            winners[agent_ids[0]] = seat_id
+            for loser in agent_ids[1:]:
+                rewards[loser] = rewards.get(loser, 0.0) - 0.75
+
+        for agent_id, seat_id in winners.items():
+            self._move_agent(self.agents[agent_id], seat_id)
+        self._refresh_agent_id_lists()
+        return rewards
+
     def _move_agent(self, agent: SimAgent, new_seat_id: str) -> None:
         current_seat_id = agent.current_seat_id
         if current_seat_id is not None:
@@ -459,7 +549,7 @@ class LibrarySimulation:
         self.world.occupy_seat(new_seat_id, agent.id)
         agent.record_seat(new_seat_id, self.world.spec.seats[new_seat_id].zone_id)
         agent.total_moves += 1
-        if agent.role == "focal":
+        if agent.role in {"focal", "learning"}:
             agent.cooldown_steps_remaining = self.config.focal_move_cooldown_steps
 
     def _remove_agent(self, agent_id: str) -> None:
