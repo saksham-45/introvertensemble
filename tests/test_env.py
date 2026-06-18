@@ -1,13 +1,25 @@
 from __future__ import annotations
 
+import sys
 import unittest
-import numpy as np
-import gymnasium as gym
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+try:
+    import gymnasium as gym
+except ImportError:
+    gym = None
 
 from introvertensemble import LibraryEnv
 from introvertensemble.simulation import SimulationConfig
 
 class TestLibraryEnv(unittest.TestCase):
+    def setUp(self) -> None:
+        if gym is None:
+            self.skipTest("gymnasium is not installed")
+
     def test_env_initialization(self) -> None:
         env = LibraryEnv(seed=42)
         self.assertEqual(env.observation_space.shape, (141,))

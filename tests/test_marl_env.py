@@ -8,6 +8,11 @@ from introvertensemble.simulation import SimulationConfig
 
 class LibraryParallelEnvTests(unittest.TestCase):
     def test_conflicting_learning_agent_claims_resolve_without_duplicate_occupancy(self) -> None:
+        try:
+            import pettingzoo  # noqa: F401
+        except ImportError as exc:
+            raise unittest.SkipTest("pettingzoo is not installed") from exc
+
         config = SimulationConfig(
             focal_agent_enabled=False,
             events_enabled=False,
