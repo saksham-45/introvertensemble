@@ -125,10 +125,12 @@ cython_debug
 # Introvertensemble specific
 logs/
 models/
+results/
+checkpoints/
 *.zip
 *.log
-*.csv
-*.json
+# NB: do NOT blanket-ignore *.json / *.csv — layout assets under assets/ and
+# committed result summaries under docs/ are data we track on purpose.
 
 # macOS
 .DS_Store
