@@ -61,6 +61,7 @@ def main() -> None:
     parser.add_argument("--eval-freq", type=int, default=10_000)
     parser.add_argument("--out", type=Path, default=ROOT / "models" / "ppo_generalist")
     parser.add_argument("--log-dir", type=Path, default=ROOT / "logs" / "ppo_generalist")
+    parser.add_argument("--progress", action="store_true", help="Show tqdm progress bar (needs a tty).")
     args = parser.parse_args()
 
     try:
@@ -119,7 +120,7 @@ def main() -> None:
     (args.out.parent / "run_config.json").write_text(json.dumps(run_config, indent=2))
 
     print(f"Training PPO for {args.timesteps:,} steps on {args.n_envs} envs...")
-    model.learn(total_timesteps=args.timesteps, callback=eval_callback, progress_bar=True)
+    model.learn(total_timesteps=args.timesteps, callback=eval_callback, progress_bar=args.progress)
 
     model.save(str(args.out))
     train_env.save(str(args.out.parent / "vecnormalize.pkl"))

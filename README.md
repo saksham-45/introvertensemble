@@ -179,6 +179,41 @@ Reward mode: `environment` · spawn: `random` · 30–30 episodes/cell · total 
 
 <!-- results:end -->
 
+## Generalist agent on procedurally generated layouts
+
+The strongest agent is trained not on the 4 bundled layouts but on a **pool of
+procedurally generated libraries** with **domain randomization** over people and
+settings, then evaluated on a **held-out set of layouts it never saw** — the
+ProcGen generalization protocol (see [docs/TRAINING_BEST_PRACTICES.md](docs/TRAINING_BEST_PRACTICES.md)).
+
+```bash
+# 1. generate disjoint train / val / test layout pools (reproducible from seeds)
+./run.sh gen-layouts --n-train 128 --n-val 16 --n-test 16
+
+# 2. train PPO with VecNormalize + domain randomization; best model chosen on val
+./run.sh train-gen --timesteps 400000 --n-envs 6 --seed 0 \
+    --out models/ppo_generalist/seed_0/ppo_generalist
+
+# 3. evaluate on the never-seen TEST pool vs baselines; measure the gen. gap
+./run.sh eval-gen --model models/ppo_generalist/seed_0/best_model.zip \
+    --vecnormalize models/ppo_generalist/seed_0/vecnormalize.pkl \
+    --episodes 60 --export-json results/gen_seed_0.json
+
+# 4. aggregate across seeds with IQM + bootstrap CIs (rliable methodology)
+python scripts/aggregate_seeds.py results/gen_seed_*.json --print
+```
+
+The **generalization gap** (return on seen train layouts minus unseen test
+layouts) is the headline number — a small gap means the policy learned
+seat-selection *competence*, not layout memorization.
+
+<!-- generalist:begin -->
+_No generalist results committed yet. Run the four steps above._
+<!-- generalist:end -->
+
 ## Project docs
 
-See [LIBRARY_MARL_RESEARCH_PLAN.md](LIBRARY_MARL_RESEARCH_PLAN.md) for the full research roadmap, terminology, and planned multi-layout / multi-agent extensions.
+- [docs/RESEARCH_ENGINEERING_PLAN.md](docs/RESEARCH_ENGINEERING_PLAN.md) — research framing, bug register, roadmap
+- [docs/TRAINING_BEST_PRACTICES.md](docs/TRAINING_BEST_PRACTICES.md) — cited PPO/PCG/eval recipe
+- [docs/LIBRARY_MARL_RESEARCH_PLAN.md](docs/LIBRARY_MARL_RESEARCH_PLAN.md) — original MARL roadmap and terminology
+- [decisions.md](decisions.md) — ADR-lite log of modeling choices
