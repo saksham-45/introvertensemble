@@ -127,6 +127,8 @@ logs/
 models/
 results/
 checkpoints/
+# Generated layout pools are reproducible from seeds (scripts/generate_layouts.py)
+assets/generated/
 *.zip
 *.log
 # NB: do NOT blanket-ignore *.json / *.csv — layout assets under assets/ and
