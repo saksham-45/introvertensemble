@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 from collections import defaultdict
 from dataclasses import replace
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -29,7 +29,7 @@ class LibraryParallelEnv(ParallelEnv if ParallelEnv is not object else object):
     def __init__(
         self,
         layout_names: str | list[str] = "library_v1",
-        config: Optional[SimulationConfig] = None,
+        config: SimulationConfig | None = None,
         seed: int = 42,
         initial_learning_agent_count: int = 20,
         max_learning_agents: int = 200,
@@ -86,7 +86,7 @@ class LibraryParallelEnv(ParallelEnv if ParallelEnv is not object else object):
             learning_agent_count=max(config.learning_agent_count, initial_learning_agent_count),
         )
 
-    def _reset_layout(self, seed: Optional[int] = None) -> None:
+    def _reset_layout(self, seed: int | None = None) -> None:
         selector_seed = seed if seed is not None else self.sim_seed
         local_random = np.random.RandomState(selector_seed)
         if self.layout_names:
@@ -99,7 +99,7 @@ class LibraryParallelEnv(ParallelEnv if ParallelEnv is not object else object):
         self.spec = load_layout(layout_dir)
         self.seat_ids = sorted(list(self.spec.seats.keys()))
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def observation_space(self, agent: str) -> Any:
         from gymnasium import spaces
 
@@ -110,7 +110,7 @@ class LibraryParallelEnv(ParallelEnv if ParallelEnv is not object else object):
             dtype=np.float32,
         )
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def action_space(self, agent: str) -> Any:
         from gymnasium import spaces
 
@@ -130,8 +130,8 @@ class LibraryParallelEnv(ParallelEnv if ParallelEnv is not object else object):
 
     def reset(
         self,
-        seed: Optional[int] = None,
-        options: Optional[dict[str, Any]] = None,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
     ) -> tuple[dict[str, np.ndarray], dict[str, dict[str, Any]]]:
         del options
         if seed is not None:

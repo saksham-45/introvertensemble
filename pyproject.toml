@@ -51,7 +51,17 @@ src = ["src", "scripts", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-ignore = ["E501"]  # long lines are tolerated in this research code
+ignore = [
+  "E501",  # long lines are tolerated in this research code
+  "B905",  # zip(strict=) not required; call sites are equal-length by construction
+  "B019",  # method-level caches are on short-lived per-episode objects
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Scripts and tests prepend src/ to sys.path before importing the package (dev
+# ergonomics), which necessarily happens after the path-setup statements.
+"scripts/*" = ["E402"]
+"tests/*" = ["E402"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

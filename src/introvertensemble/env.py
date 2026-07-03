@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from typing import Any
 
 import numpy as np
@@ -16,10 +15,10 @@ except ImportError:
     spaces = None
 
 from .loader import load_layout
-from .world import LibraryWorld
-from .simulation import LibrarySimulation, SimulationConfig
-from .scoring import SeatScorer
 from .observations import ObservationBuilder
+from .scoring import SeatScorer
+from .simulation import LibrarySimulation, SimulationConfig
+from .world import LibraryWorld
 
 
 class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
@@ -71,7 +70,10 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
         from .loader import default_layout_root
         self._layout_root = default_layout_root()
 
-        # Default config with focal agent enabled and under external control
+        # The env always drives the focal agent externally; every other config
+        # field (including future ones) is preserved via replace() rather than a
+        # lossy field-by-field copy.
+        from dataclasses import replace
         if config is None:
             self.config = SimulationConfig(
                 focal_agent_enabled=True,
@@ -81,24 +83,13 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
                 focal_agent_external_control=True,
             )
         else:
-            # Override to ensure focal agent is enabled and externally controlled
-            self.config = SimulationConfig(
-                step_minutes=config.step_minutes,
-                introvert_share=config.introvert_share,
-                min_session_steps=config.min_session_steps,
-                max_session_steps=config.max_session_steps,
-                reseat_margin=config.reseat_margin,
-                background_profile_mix=config.background_profile_mix,
+            self.config = replace(
+                config,
                 focal_agent_enabled=True,
-                focal_agent_entrance_id=config.focal_agent_entrance_id,
-                focal_agent_session_steps=config.focal_agent_session_steps,
-                focal_agent_initial_seat_history=config.focal_agent_initial_seat_history,
-                focal_move_cooldown_steps=config.focal_move_cooldown_steps,
-                events_enabled=config.events_enabled,
                 focal_agent_external_control=True,
-                focal_agent_never_departs=config.focal_agent_never_departs,
             )
-            
+
+
         self.initial_seed = seed
         self.sim_seed = seed
         self.world = None

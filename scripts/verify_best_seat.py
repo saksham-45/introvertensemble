@@ -13,6 +13,7 @@ from introvertensemble.env import LibraryEnv
 from introvertensemble.scoring import SeatScorer
 from introvertensemble.simulation import SimulationConfig
 
+
 def main():
     # Create a config that lets the simulation place the focal agent using its heuristic
     config = SimulationConfig(

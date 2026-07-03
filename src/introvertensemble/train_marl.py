@@ -93,10 +93,7 @@ def main() -> None:
     config = build_config(args)
     checkpoint_dir = Path(args.checkpoint_dir) if args.checkpoint_dir else None
 
-    if args.resume_checkpoint:
-        algo = PPO.from_checkpoint(args.resume_checkpoint)
-    else:
-        algo = config.build()
+    algo = PPO.from_checkpoint(args.resume_checkpoint) if args.resume_checkpoint else config.build()
 
     try:
         progress = 0

@@ -38,6 +38,10 @@ class SimulationConfig:
     events_enabled: bool = True
     focal_agent_external_control: bool = False
     focal_agent_never_departs: bool = False
+    # When True the focal agent arrives at a uniformly random free seat instead
+    # of the scoring argmax. This makes evaluation discriminative: policies must
+    # actually find good seats rather than inheriting the optimum at spawn (B3).
+    focal_agent_random_spawn: bool = False
     all_agents_learning: bool = False
     marl_population_mix: tuple[tuple[str, float], ...] = (
         ("standard", 0.70),
@@ -360,6 +364,12 @@ class LibrarySimulation:
     def _choose_arrival_seat(self, agent: SimAgent) -> str | None:
         if agent.role != "focal":
             return self._best_available_seat(agent, origin_entrance_id=agent.entrance_id)
+
+        if self.config.focal_agent_random_spawn:
+            available = self.world.available_seats()
+            if not available:
+                return None
+            return self.random.choice(available).id
 
         preferred_seat_id = agent.dominant_seat_id()
         if preferred_seat_id is not None and self.world.occupancy.get(preferred_seat_id) is None:
