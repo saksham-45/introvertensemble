@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches: [main, research-hardening]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install (base + dev)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint (ruff)
+        run: ruff check src/ scripts/ tests/
+
+      - name: Test (pytest, includes Gymnasium env_checker + reward regressions)
+        run: pytest
+
+      - name: Guard — no tracked build artifacts
+        run: |
+          if git ls-files | grep -E 'egg-info/|^models/|^logs/|^results/'; then
+            echo "::error::build artifacts are tracked; add them to .gitignore and git rm --cached"
+            exit 1
+          fi
+
+  smoke-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Smoke eval (baselines only, must produce a well-formed export)
+        run: |
+          python scripts/evaluate_agent.py --episodes 2 --eval-layouts library_v1 \
+            --export-json /tmp/smoke.json
+          python -c "import json; d=json.load(open('/tmp/smoke.json')); assert d and 'total_reward' in d[0]; print('smoke ok:', len(d), 'records')"
