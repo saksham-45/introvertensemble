@@ -1,0 +1,112 @@
+[
+  {
+    "layout": "test_pool (unseen)",
+    "policy": "Best-seat (myopic, all seats)",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": 49.349678002202864,
+    "iqm_ci_low": 47.910814113801884,
+    "iqm_ci_high": 50.95211915613974,
+    "mean": 52.309756414127875,
+    "median": 49.891538888888874
+  },
+  {
+    "layout": "test_pool (unseen)",
+    "policy": "Greedy (candidate actions)",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": 49.231712314331716,
+    "iqm_ci_low": 47.74892796601872,
+    "iqm_ci_high": 50.74658558341344,
+    "mean": 51.66263499587466,
+    "median": 49.625355649912834
+  },
+  {
+    "layout": "test_pool (unseen)",
+    "policy": "No-op (stay put)",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": -18.18913677128037,
+    "iqm_ci_low": -33.00780182768047,
+    "iqm_ci_high": -2.7382055399910303,
+    "mean": -10.633332432751187,
+    "median": -33.04907333333334
+  },
+  {
+    "layout": "test_pool (unseen)",
+    "policy": "Random",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": -17.858530040413758,
+    "iqm_ci_low": -22.917170934912797,
+    "iqm_ci_high": -12.748288790060283,
+    "mean": -17.264230650233962,
+    "median": -17.065829991729984
+  },
+  {
+    "layout": "test_pool (unseen)",
+    "policy": "Trained PPO",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": 47.914596301567045,
+    "iqm_ci_low": 46.837523585263156,
+    "iqm_ci_high": 48.96392022792855,
+    "mean": 50.132921329309056,
+    "median": 48.13195440620528
+  },
+  {
+    "layout": "train_pool (seen)",
+    "policy": "Best-seat (myopic, all seats)",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": 51.23118987983192,
+    "iqm_ci_low": 48.92745116370602,
+    "iqm_ci_high": 55.947754795268295,
+    "mean": 55.733863795869475,
+    "median": 50.33234324646611
+  },
+  {
+    "layout": "train_pool (seen)",
+    "policy": "Greedy (candidate actions)",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": 50.222840910334185,
+    "iqm_ci_low": 48.57313867557239,
+    "iqm_ci_high": 54.04192832984087,
+    "mean": 54.44152009202103,
+    "median": 49.70018500483211
+  },
+  {
+    "layout": "train_pool (seen)",
+    "policy": "No-op (stay put)",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": -26.434391089499346,
+    "iqm_ci_low": -33.716049369655614,
+    "iqm_ci_high": -13.39684144383434,
+    "mean": -13.197519560698998,
+    "median": -32.481364907495895
+  },
+  {
+    "layout": "train_pool (seen)",
+    "policy": "Random",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": -32.00873321754327,
+    "iqm_ci_low": -35.93815297320187,
+    "iqm_ci_high": -28.268545905974374,
+    "mean": -31.76403810697652,
+    "median": -30.75774277560516
+  },
+  {
+    "layout": "train_pool (seen)",
+    "policy": "Trained PPO",
+    "n_episodes": 100,
+    "n_seeds": 2,
+    "iqm": 49.79318593674404,
+    "iqm_ci_low": 48.333990283055826,
+    "iqm_ci_high": 52.82965801496953,
+    "mean": 54.061914000925896,
+    "median": 49.35223703211392
+  }
+]

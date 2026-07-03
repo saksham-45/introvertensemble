@@ -207,8 +207,36 @@ The **generalization gap** (return on seen train layouts minus unseen test
 layouts) is the headline number — a small gap means the policy learned
 seat-selection *competence*, not layout memorization.
 
+**Verdict (current run).** Trained on 128 generated layouts with domain
+randomization, the PPO agent **generalizes**: on 16 never-seen test layouts it
+scores ~48–50 (IQM), a **~2–5 point gap** below its seen-layout score — small,
+so it learned transferable competence rather than memorizing maps. It **beats
+No-op and Random by ~65 points** (they cannot escape a bad random spawn), and it
+lands **statistically on par with, marginally below, a score-informed greedy** —
+despite the true seat score being *withheld* from its observations. That is the
+expected, honest ceiling: with this reward the task is close to greedy-solvable,
+so a sound agent converges toward greedy rather than blowing past it; matching it
+from raw features alone is the real result. *Limitation:* the table below
+aggregates **2 training seeds** (compute-limited); ≥3–5 is preferable and can be
+added by training more seeds and re-running `aggregate_seeds.py`.
+
 <!-- generalist:begin -->
-_No generalist results committed yet. Run the four steps above._
+
+Aggregated over **2 training seed(s)**, environment reward, random spawn. Metric: **IQM** (interquartile mean) with 95% bootstrap CI. Higher is better.
+
+| Split | Policy | IQM total reward [95% CI] | Mean |
+|-------|--------|---------------------------|------|
+| test_pool (unseen) | Best-seat (myopic, all seats) | 49.35 [47.91, 50.95] | 52.31 |
+| test_pool (unseen) | Greedy (candidate actions) | 49.23 [47.75, 50.75] | 51.66 |
+| test_pool (unseen) | No-op (stay put) | -18.19 [-33.01, -2.74] | -10.63 |
+| test_pool (unseen) | Random | -17.86 [-22.92, -12.75] | -17.26 |
+| test_pool (unseen) | Trained PPO | 47.91 [46.84, 48.96] | 50.13 |
+| train_pool (seen) | Best-seat (myopic, all seats) | 51.23 [48.93, 55.95] | 55.73 |
+| train_pool (seen) | Greedy (candidate actions) | 50.22 [48.57, 54.04] | 54.44 |
+| train_pool (seen) | No-op (stay put) | -26.43 [-33.72, -13.40] | -13.20 |
+| train_pool (seen) | Random | -32.01 [-35.94, -28.27] | -31.76 |
+| train_pool (seen) | Trained PPO | 49.79 [48.33, 52.83] | 54.06 |
+
 <!-- generalist:end -->
 
 ## Project docs
