@@ -39,10 +39,43 @@ def bootstrap_ci(values: np.ndarray, statistic, n_boot: int = 5000, seed: int = 
     return (float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5)))
 
 
+GEN_BEGIN = "<!-- generalist:begin -->"
+GEN_END = "<!-- generalist:end -->"
+
+
+def render_markdown(summary: list[dict], n_seeds: int) -> str:
+    lines = [
+        GEN_BEGIN, "",
+        f"Aggregated over **{n_seeds} training seed(s)**, environment reward, random spawn. "
+        "Metric: **IQM** (interquartile mean) with 95% bootstrap CI. Higher is better.",
+        "",
+        "| Split | Policy | IQM total reward [95% CI] | Mean |",
+        "|-------|--------|---------------------------|------|",
+    ]
+    for row in summary:
+        lines.append(
+            f"| {row['layout']} | {row['policy']} | "
+            f"{row['iqm']:.2f} [{row['iqm_ci_low']:.2f}, {row['iqm_ci_high']:.2f}] | {row['mean']:.2f} |"
+        )
+    lines += ["", GEN_END]
+    return "\n".join(lines)
+
+
+def inject_readme(readme: Path, block: str) -> None:
+    text = readme.read_text()
+    if GEN_BEGIN in text and GEN_END in text:
+        pre = text[: text.index(GEN_BEGIN)]
+        post = text[text.index(GEN_END) + len(GEN_END):]
+        readme.write_text(pre + block + post)
+    else:
+        readme.write_text(text.rstrip() + "\n\n## Generalist results\n\n" + block + "\n")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Aggregate per-seed eval exports with IQM + bootstrap CIs.")
     parser.add_argument("results", type=Path, nargs="+", help="Per-seed eval JSON exports.")
     parser.add_argument("--out", type=Path, help="Write aggregated summary JSON here.")
+    parser.add_argument("--readme", type=Path, help="Inject an IQM table into the README generalist markers.")
     parser.add_argument("--print", dest="print_table", action="store_true")
     args = parser.parse_args()
 
@@ -76,6 +109,10 @@ def main() -> None:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(json.dumps(summary, indent=2))
         print(f"\nWrote aggregated summary to {args.out}")
+
+    if args.readme:
+        inject_readme(args.readme, render_markdown(summary, n_seeds))
+        print(f"Injected IQM table into {args.readme}")
 
 
 if __name__ == "__main__":
