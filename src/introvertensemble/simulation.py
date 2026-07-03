@@ -59,6 +59,22 @@ class StepSummary:
     zone_load: dict[str, int]
 
 
+@dataclass(frozen=True)
+class MoveResult:
+    """Outcome of an externally-requested relocation.
+
+    Single source of truth for "move the focal/learning agent to a seat",
+    shared by LibraryEnv.step, the evaluation baselines, and the oracle so the
+    three cannot silently drift apart (B13).
+    """
+
+    moved: bool
+    agent_id: str
+    from_seat_id: str | None
+    to_seat_id: str | None
+    reason: str  # ok | no_agent | unknown_seat | same_seat | occupied | cooldown
+
+
 class LibrarySimulation:
     def __init__(
         self,
@@ -541,6 +557,48 @@ class LibrarySimulation:
             self._move_agent(self.agents[agent_id], seat_id)
         self._refresh_agent_id_lists()
         return rewards
+
+    def apply_external_move(
+        self,
+        agent_id: str,
+        seat_id: str,
+        *,
+        ignore_cooldown: bool = False,
+    ) -> MoveResult:
+        """Relocate ``agent_id`` to ``seat_id`` on behalf of an external controller.
+
+        Returns a :class:`MoveResult` describing whether the move happened and,
+        if not, why. ``ignore_cooldown`` lets an upper-bound oracle re-seat every
+        step; ordinary policies (and the RL env) leave it False so the move
+        cooldown is respected.
+        """
+        agent = self.agents.get(agent_id)
+        if agent is None:
+            return MoveResult(False, agent_id, None, seat_id, "no_agent")
+        from_seat_id = agent.current_seat_id
+        if seat_id not in self.world.spec.seats:
+            return MoveResult(False, agent_id, from_seat_id, seat_id, "unknown_seat")
+        if seat_id == from_seat_id:
+            return MoveResult(False, agent_id, from_seat_id, seat_id, "same_seat")
+        if self.world.occupancy.get(seat_id) is not None:
+            return MoveResult(False, agent_id, from_seat_id, seat_id, "occupied")
+        if not ignore_cooldown and agent.cooldown_steps_remaining > 0:
+            return MoveResult(False, agent_id, from_seat_id, seat_id, "cooldown")
+        self._move_agent(agent, seat_id)
+        return MoveResult(True, agent_id, from_seat_id, seat_id, "ok")
+
+    def move_path_cost(self, from_seat_id: str | None, to_seat_id: str, agent: SimAgent) -> float:
+        """Graph path cost of a relocation, normalized to [0, 1] by max path cost.
+
+        From an occupied seat we use seat-to-seat access-node cost; when the
+        agent is arriving (no current seat) we use entrance-to-seat cost.
+        """
+        max_cost = self.scorer._max_path_cost or 1.0
+        if from_seat_id is not None:
+            from_node = self.world.spec.seats[from_seat_id].access_node_id
+            to_node = self.world.spec.seats[to_seat_id].access_node_id
+            return self.world.shortest_path_cost(from_node, to_node) / max_cost
+        return self.world.path_cost_from_entrance_to_seat(agent.entrance_id, to_seat_id) / max_cost
 
     def _move_agent(self, agent: SimAgent, new_seat_id: str) -> None:
         current_seat_id = agent.current_seat_id
