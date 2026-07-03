@@ -57,9 +57,20 @@ case "$CMD" in
         ensure_rl_deps
         "$PYTHON" "$ROOT/scripts/evaluate_agent.py" "${@:2}"
         ;;
+    gen-layouts)
+        "$PYTHON" "$ROOT/scripts/generate_layouts.py" "${@:2}"
+        ;;
+    train-gen)
+        ensure_rl_deps
+        "$PYTHON" "$ROOT/scripts/train_generalization.py" "${@:2}"
+        ;;
+    eval-gen)
+        ensure_rl_deps
+        "$PYTHON" "$ROOT/scripts/evaluate_generalization.py" "${@:2}"
+        ;;
     *)
         echo "Unknown command: $CMD"
-        echo "Usage: ./run.sh [sim|view|view-rule|test|best|train|eval]"
+        echo "Usage: ./run.sh [sim|view|view-rule|test|best|train|eval|gen-layouts|train-gen|eval-gen]"
         exit 1
         ;;
 esac

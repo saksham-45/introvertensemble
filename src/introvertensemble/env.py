@@ -45,6 +45,7 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
         score_in_obs: bool = True,
         move_cost_scale: float = 1.5,
         max_episode_steps: int = 1000,
+        domain_randomize: bool = False,
     ):
         if not HAS_GYMNASIUM:
             raise ImportError("gymnasium is required to use LibraryEnv. Please install it.")
@@ -57,6 +58,10 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
         self.score_in_obs = score_in_obs
         self.move_cost_scale = float(move_cost_scale)
         self.max_episode_steps = int(max_episode_steps)
+        self.domain_randomize = domain_randomize
+        # Dedicated RNG for per-episode settings/people randomization, seeded
+        # from the constructor seed so runs stay reproducible (B11 discipline).
+        self._dr_rng = np.random.default_rng(seed ^ 0x5EED)
 
         # Store layout names for randomization
         self.layout_names = layout_names if isinstance(layout_names, list) else [layout_names]
@@ -148,7 +153,16 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
             self._layout_rng = np.random.default_rng(seed)
         layout_index = int(self._layout_rng.integers(0, len(self.layout_names)))
         self._current_layout_name = self.layout_names[layout_index]
-        self.layout_spec = load_layout(self._layout_root / self._current_layout_name)
+        self.layout_spec = load_layout(self._resolve_layout(self._current_layout_name))
+
+    def _resolve_layout(self, name: str):
+        """Accept a bare layout name (under the asset root) or an explicit path,
+        so training can point at generated layout directories directly."""
+        from pathlib import Path
+        candidate = Path(name)
+        if candidate.is_dir():
+            return candidate
+        return self._layout_root / name
 
     def reset(
         self,
@@ -159,6 +173,11 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
         super().reset(seed=seed)
         if seed is not None:
             self.sim_seed = seed
+            # Re-anchor the domain-randomization stream so reset(seed=s) is
+            # fully reproducible (Gym determinism contract). Unseeded resets —
+            # what SB3 uses between training episodes — keep advancing it, which
+            # is what produces per-episode randomization.
+            self._dr_rng = np.random.default_rng(seed ^ 0x5EED)
         else:
             self.sim_seed += 1
 
@@ -166,14 +185,38 @@ class LibraryEnv(gym.Env if HAS_GYMNASIUM else object):
         if len(self.layout_names) > 1:
             self._reset_layout(seed)
 
+        episode_config = self._sample_episode_config()
         self.world = LibraryWorld(self.layout_spec)
-        self.sim = LibrarySimulation(self.world, config=self.config, seed=self.sim_seed)
+        self.sim = LibrarySimulation(self.world, config=episode_config, seed=self.sim_seed)
         self.obs_builder = ObservationBuilder(self.sim)
         self.scorer = SeatScorer(self.world)
         
         obs_vec = self._get_observation()
         info = self._get_info()
         return obs_vec, info
+
+    def _sample_episode_config(self) -> SimulationConfig:
+        """Optionally randomize the *people and settings* for one episode.
+
+        Layout diversity is handled by the generated pool + per-episode sim seed;
+        this adds explicit variation in the crowd's composition and the focal
+        session so the policy cannot lean on a fixed population (domain
+        randomization — docs/TRAINING_BEST_PRACTICES.md). Off => base config.
+        """
+        if not self.domain_randomize:
+            return self.config
+        from dataclasses import replace
+        rng = self._dr_rng
+        introvert_share = float(rng.uniform(0.10, 0.35))
+        base_sessions = self.config.focal_agent_session_steps
+        session_steps = int(base_sessions * rng.uniform(0.85, 1.15))
+        reseat_margin = float(rng.uniform(0.12, 0.30))
+        return replace(
+            self.config,
+            introvert_share=introvert_share,
+            focal_agent_session_steps=max(6, session_steps),
+            reseat_margin=reseat_margin,
+        )
 
     def _action_to_seat(self, action: int) -> str | None:
         """Map a discrete action index to a candidate seat id (None == stay)."""
