@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import sys
 import unittest
 from pathlib import Path
-import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -261,7 +261,6 @@ class ScoringAndSimulationTests(unittest.TestCase):
             switching_improvement_threshold=0.10,
         )
         current_seat = "QR-SC-05"
-        candidate_seat = "QR-SC-04"
         world.occupy_seat(current_seat, focal.id)
         focal.record_seat(current_seat, self.spec.seats[current_seat].zone_id)
         focal.steps_in_current_seat = 6

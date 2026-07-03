@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from .models import (
@@ -134,8 +135,34 @@ def _validate(spec: LayoutSpec) -> None:
                 raise ValueError(f"Feature layer {layer.name} references unknown zone {zone_id}")
 
 
+def default_layout_root() -> Path:
+    """Resolve the directory that holds the ``library_*`` layout folders.
+
+    Resolution order (B10 — works whether the package is used editable,
+    installed as a wheel, or pointed at a custom asset dir):
+      1. ``INTROVERTENSEMBLE_LAYOUT_DIR`` environment override.
+      2. Assets shipped inside the installed package (``<pkg>/assets/layouts``).
+      3. Repo-root assets for editable/dev checkouts (``<repo>/assets/layouts``).
+    """
+    override = os.environ.get("INTROVERTENSEMBLE_LAYOUT_DIR")
+    if override:
+        return Path(override)
+    packaged = Path(__file__).resolve().parent / "assets" / "layouts"
+    if packaged.exists():
+        return packaged
+    return Path(__file__).resolve().parents[2] / "assets" / "layouts"
+
+
+def resolve_layout_dir(layout: str | Path) -> Path:
+    """Accept either a layout *name* (``"library_v1"``) or an explicit path."""
+    candidate = Path(layout)
+    if candidate.exists() and candidate.is_dir():
+        return candidate
+    return default_layout_root() / str(layout)
+
+
 def load_layout(layout_dir: str | Path) -> LayoutSpec:
-    layout_root = Path(layout_dir)
+    layout_root = resolve_layout_dir(layout_dir)
     manifest = _read_json(layout_root / "layout_manifest.json")
     bounds = MapBounds(**manifest["map"])
     zones = _load_zones(layout_root / manifest["files"]["zones"])

@@ -24,7 +24,7 @@ class AgentProfile:
     seat_type_preferences: dict[str, float] = field(default_factory=dict)
 
     @classmethod
-    def introvert(cls) -> "AgentProfile":
+    def introvert(cls) -> AgentProfile:
         return cls(
             name="introvert",
             privacy_weight=1.45,
@@ -58,7 +58,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def focal_introvert(cls) -> "AgentProfile":
+    def focal_introvert(cls) -> AgentProfile:
         return cls(
             name="focal_introvert",
             privacy_weight=1.65,
@@ -93,7 +93,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def standard(cls) -> "AgentProfile":
+    def standard(cls) -> AgentProfile:
         return cls(
             name="standard",
             privacy_weight=0.90,
@@ -123,7 +123,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def quiet_seeker(cls) -> "AgentProfile":
+    def quiet_seeker(cls) -> AgentProfile:
         return cls(
             name="quiet_seeker",
             privacy_weight=1.20,
@@ -155,7 +155,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def comfort_seeker(cls) -> "AgentProfile":
+    def comfort_seeker(cls) -> AgentProfile:
         return cls(
             name="comfort_seeker",
             privacy_weight=0.62,
@@ -186,7 +186,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def outlet_seeker(cls) -> "AgentProfile":
+    def outlet_seeker(cls) -> AgentProfile:
         return cls(
             name="outlet_seeker",
             privacy_weight=0.70,
@@ -216,7 +216,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def opportunistic_reseater(cls) -> "AgentProfile":
+    def opportunistic_reseater(cls) -> AgentProfile:
         return cls(
             name="opportunistic_reseater",
             privacy_weight=0.76,
@@ -245,7 +245,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def collaborator(cls) -> "AgentProfile":
+    def collaborator(cls) -> AgentProfile:
         return cls(
             name="collaborator",
             privacy_weight=0.25,
@@ -278,7 +278,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def extrovert(cls) -> "AgentProfile":
+    def extrovert(cls) -> AgentProfile:
         return cls(
             name="extrovert",
             privacy_weight=0.22,
@@ -312,7 +312,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def neutral(cls) -> "AgentProfile":
+    def neutral(cls) -> AgentProfile:
         return cls(
             name="neutral",
             privacy_weight=0.70,
@@ -342,7 +342,7 @@ class AgentProfile:
         )
 
     @classmethod
-    def antisocial(cls) -> "AgentProfile":
+    def antisocial(cls) -> AgentProfile:
         return cls(
             name="antisocial",
             privacy_weight=1.75,

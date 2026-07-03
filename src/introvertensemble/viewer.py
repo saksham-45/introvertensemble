@@ -10,7 +10,6 @@ from PIL import Image, ImageDraw, ImageFont
 from .simulation import LibrarySimulation, StepSummary
 from .world import LibraryWorld
 
-
 ZONE_COLORS = {
     "quiet_study": (120, 176, 126),
     "general_study": (220, 219, 154),

@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+import sys
 import unittest
 from pathlib import Path
-import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from introvertensemble import LibrarySimulation, LibraryWorld, ObservationBuilder, load_layout
-from introvertensemble.metrics import run_episode
 from introvertensemble.events import EventEngine, EventTemplate
+from introvertensemble.metrics import run_episode
 from introvertensemble.simulation import SimulationConfig
 
 

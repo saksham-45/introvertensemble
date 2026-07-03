@@ -5,7 +5,6 @@ from dataclasses import dataclass
 
 from .models import ActiveEvent, EventTemplate
 
-
 DEFAULT_EVENT_TEMPLATES: tuple[EventTemplate, ...] = (
     EventTemplate(
         id="collaboration_burst",

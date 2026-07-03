@@ -15,6 +15,7 @@ except ImportError:
 from introvertensemble import LibraryEnv
 from introvertensemble.simulation import SimulationConfig
 
+
 class TestLibraryEnv(unittest.TestCase):
     def setUp(self) -> None:
         if gym is None:

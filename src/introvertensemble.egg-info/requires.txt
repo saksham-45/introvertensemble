@@ -1,9 +1,0 @@
-Pillow<12,>=10
-pygame<3,>=2.6
-numpy>=1.24
-gymnasium>=0.29
-
-[rl]
-stable-baselines3<3,>=2.3
-torch>=2.0
-tensorboard>=2.14
